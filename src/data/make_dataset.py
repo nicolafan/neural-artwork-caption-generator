@@ -14,9 +14,10 @@ def main(input_dir, output_dir):
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+    logger.info("making final data set from raw data")
 
-    image_filenames = os.listdir(input_dir / "images-resized")
+    annotations_df = pd.read_csv(input_dir / "annotations.csv")
+    image_filenames = annotations_df[annotations_df.notna().all(axis=1)]["image"].tolist()
     n = len(image_filenames)
     train_n = int(n * 0.7)
     val_n = int(n * 0.15)
@@ -29,8 +30,6 @@ def main(input_dir, output_dir):
     os.makedirs(output_dir / "val", exist_ok=True)
     os.makedirs(output_dir / "test", exist_ok=True)
 
-    captions_df = pd.read_csv(input_dir / "captions.csv", index_col=0)
-
     for filenames, split in zip((train_filenames, val_filenames, test_filenames), ("train", "val", "test")):
         logger.info(f"making {split} dataset")
         split_captions = []
@@ -38,10 +37,9 @@ def main(input_dir, output_dir):
             if not (output_dir / split / filename).is_file():
                 shutil.copyfile(input_dir / "images-resized" / filename, output_dir / split / filename)
             try:
-                row = captions_df[captions_df["name"] == filename]
+                row = annotations_df[annotations_df["image"] == filename]
                 caption_d = {
                     "file_name": filename,
-                    "prompt": row["prompt"].iloc[0],
                     "text": row["caption"].iloc[0]
                 }
                 split_captions.append(caption_d)
