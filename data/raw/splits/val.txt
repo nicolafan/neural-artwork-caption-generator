@@ -72,7 +72,7 @@ patrick-pietropoli_the-empire-state.jpg
 paolo-veronese_st-francis-in-ecstasy.jpg
 rembrandt_a-ragged-peasant-with-his-hands-behind-him-1635.jpg
 salvador-dali_the-railway-station-at-perpignan.jpg
-joaqu-n-sorolla_noria-j%C3%A1vea.jpg
+joaqu-n-sorolla_noria-jávea.jpg
 john-singer-sargent_ellen-terry-as-lady-macbeth-1889.jpg
 bartolome-esteban-murillo_penitent-magdalene-1665.jpg
 camille-corot_mother-and-child-on-the-beach-1860.jpg
@@ -147,7 +147,7 @@ eyvind-earle_mauve-redand-purple.jpg
 gheorghe-tattarescu_self-portrait.jpg
 martiros-sarian_yellow-flowers-1944.jpg
 pavel-fedotov_portrait-of-m-m-rodivanovsky.jpg
-jacques-louis-david_portrait-of-anne-marie-louise-th%C3%A9lusson-countess-of-sorcy-1790.jpg
+jacques-louis-david_portrait-of-anne-marie-louise-thélusson-countess-of-sorcy-1790.jpg
 iosif-iser_tatar-woman-with-mandoline-1946.jpg
 agnes-goodsir_portrait-of-rachel-dunn.jpg
 louis-comfort-tiffany_my-family-at-somesville-1888.jpg
@@ -164,7 +164,7 @@ samuel-buri_akt-1997.jpg
 thomas-hill_yosemite-falls.jpg
 ernst-ludwig-kirchner_portrait-of-van-de-velde.jpg
 octav-bancila_ig-ncu-cu-basma-ro-ie-1908.jpg
-lucas-cranach-the-elder_portrait-of-magdeburg-theologians-dr-johannes-sch%C3%B6ner-1529.jpg
+lucas-cranach-the-elder_portrait-of-magdeburg-theologians-dr-johannes-schöner-1529.jpg
 lucas-cranach-the-elder_reformators.jpg
 pierre-auguste-renoir_tree-blooming.jpg
 anne-truitt_snow-sea-1981.jpg
@@ -320,7 +320,7 @@ heinrich-lefler_die-bucher-der-chronika-der-drei-schwestern-6-1900.jpg
 vincent-van-gogh_trees-and-undergrowth-1887.jpg
 albrecht-durer_study-of-drapery-1508.jpg
 albert-rafols-casamada_blau-antic-1990.jpg
-suzanne-valadon_genevi%C3%A8ve-camax-zoegger-1936.jpg
+suzanne-valadon_geneviève-camax-zoegger-1936.jpg
 thomas-eakins_signora-gomez-d-arza-1902.jpg
 sam-francis_sfm83-458-1983.jpg
 henri-matisse_two-young-girls-in-a-coral-interior-blue-garden-1947.jpg
@@ -444,7 +444,7 @@ ivan-eyre_north-northwest-1980.jpg
 beatrix-potter_the-mice-sewing-the-mayor-s-coat-1902.jpg
 karl-bryullov_the-narcissus.jpg
 paul-ranson_untitled-3.jpg
-albrecht-durer_the-open-f%C3%BCrlegerin-with-hair-1497.jpg
+albrecht-durer_the-open-fürlegerin-with-hair-1497.jpg
 giovanni-domenico-tiepolo_the-minuet-or-carnival-scene-1755.jpg
 odilon-redon_the-winged-man-the-fallen-angel-1880.jpg
 maurice-utrillo_la-butte-pinson.jpg
@@ -1383,7 +1383,7 @@ luciano-bartolini_untitled-1983.jpg
 ivan-aivazovsky_venetian-night.jpg
 ivan-albright_mt-semeru-jadka-kura-java-1969.jpg
 albrecht-durer_johannes-kleberger-1526.jpg
-koloman-moser_holy-spirit-church-in-d%C3%BCsseldorf-design-for-the-right-side-wall-1907.jpg
+koloman-moser_holy-spirit-church-in-düsseldorf-design-for-the-right-side-wall-1907.jpg
 ivan-shishkin_bull-1863.jpg
 carla-accardi_rettangolo-rosso-1960.jpg
 constantin-artachino_on-the-meadow.jpg
@@ -1409,7 +1409,7 @@ eugene-boudin_antwerp-the-port.jpg
 zdislav-beksinski_untitled-97.jpg
 paul-cezanne_the-halle-aux-vins-seen-from-the-rue-de-jussieu-1872.jpg
 derek-boshier_the-identi-kit-man-1962.jpg
-jean-auguste-dominique-ingres_pierre-marie-fran%C3%A7ois-de-sales-baillot.jpg
+jean-auguste-dominique-ingres_pierre-marie-françois-de-sales-baillot.jpg
 edouard-cortes_triumphal-arch-4.jpg
 pietro-longhi_the-new-world.jpg
 leon-arthur-tutundjian_circles-and-lines-1965.jpg
@@ -1590,7 +1590,7 @@ charles-andre-van-loo-carle-van-loo_the-drunkenness-of-silenus.jpg
 dimitris-mytaras_figures.jpg
 john-flaxman_illustration-to-the-iliad-1795-14.jpg
 ivan-aivazovsky_seascape-1878.jpg
-vincent-van-gogh_portrait-of-p%C3%A8re-tanguy.jpg
+vincent-van-gogh_portrait-of-père-tanguy.jpg
 sophie-taeuber-arp_vertical-and-horizontal-composition-1916.jpg
 joseph-wright_the-earthstopper-on-the-banks-of-the-derwent-1773.jpg
 nicolae-tonitza_house-of-dobrogea.jpg
@@ -2077,7 +2077,7 @@ lo-scheggia_reclining-youth.jpg
 fra-angelico_perugia-altarpiece-1448.jpg
 david-teniers-the-younger_the-temptation-of-st-anthony-1.jpg
 theodor-severin-kittelsen_christmas-troll-juletroll-1907.jpg
-joaqu-n-sorolla_portrait-of-dona-elena-ort%C3%BAzar.jpg
+joaqu-n-sorolla_portrait-of-dona-elena-ortúzar.jpg
 camille-pissarro_paul-writing.jpg
 pablo-picasso_seated-female-nude-1959.jpg
 kasramvd_wild-nature-of-your-body.jpg
@@ -2134,7 +2134,7 @@ vasily-polenov_sketches-of-the-russian-turkish-war-bulgarian-house-1877.jpg
 charles-blackman_two-schoolgirls.jpg
 felipe-de-vicente_art-95-2015.jpg
 salvador-dali_portrait-of-sefiora-abadal-de-argemi.jpg
-edouard-cortes_champs-%C3%A9lys%C3%A9es.jpg
+edouard-cortes_champs-élysées.jpg
 theodor-severin-kittelsen_humle.jpg
 jose-gutierrez-solana_women-of-life-1917.jpg
 francis-bott_d-j-le-masque-s-affirme-harmonieusement-contre-le-visage.jpg
@@ -2909,7 +2909,7 @@ ivan-albright_moscow-1967.jpg
 john-hoppner_little-girl-by-the-sea.jpg
 ferdinand-hodler_self-portrait-1916.jpg
 marc-chagall_moses-spreads-the-darkness-over-egypt-exodus-ix-21-23.jpg
-jean-auguste-dominique-ingres_jean-fran%C3%A7ois-julien-menager.jpg
+jean-auguste-dominique-ingres_jean-françois-julien-menager.jpg
 titian_angel-of-the-annunciation.jpg
 jimmy-ernst_stillness-1956.jpg
 john-jackson_william-charles-macready-1821.jpg
@@ -3250,7 +3250,7 @@ salvador-dali_portrait-of-gala-gala-against-the-light.jpg
 joaqu-n-sorolla_the-port-of-valencia-1882.jpg
 hendrick-avercamp_man-met-kolfstok-1625-0.jpg
 jane-frank_plum-point-1964.jpg
-gustave-moreau_salom%C3%A9.jpg
+gustave-moreau_salomé.jpg
 vincent-van-gogh_a-marsh-1881.jpg
 marc-chagall_study-to-the-jacob-s-dream.jpg
 maria-primachenko_forest-bird-with-it-s-child-1961.jpg
@@ -3599,7 +3599,7 @@ mstislav-dobuzhinsky_courtyard-in-shaukenay-1934.jpg
 charles-turner_sir-henry-charles-englefield-7th-bt-1821.jpg
 leon-bakst_narcisse-1911-1.jpg
 honore-daumier_the-thieves-and-the-donkey-1860.jpg
-pablo-picasso_man-and-woman-in-caf%C3%A9-study-1903.jpg
+pablo-picasso_man-and-woman-in-café-study-1903.jpg
 edgar-degas_dancers.jpg
 francisco-toledo_el-cerdo-rosado.jpg
 james-tissot_noah-s-sacrifice.jpg
@@ -3808,7 +3808,7 @@ abdul-mati-klarwein_baron-edmond-de-rothschild-ii-1963.jpg
 alexander-orlowski_self-portrait-in-a-suit-of-a-caucasian-warrior.jpg
 maurice-utrillo_rue-jean-durand-et-leglise-stains-seine-saint-denis-1940.jpg
 jacek-yerka_two-worlds-and-even-one.jpg
-ferdinand-hodler_modern-r%C3%BCtli-1887.jpg
+ferdinand-hodler_modern-rütli-1887.jpg
 henri-rousseau_woman-walking-in-an-exotic-forest-1905.jpg
 berthe-morisot_in-a-villa-at-the-seaside.jpg
 jose-maria-velasco_autoretrato-1864.jpg
@@ -3867,7 +3867,7 @@ charles-willson-peale_thomas-and-henry-sergeant-1787.jpg
 roger-weik_tandem-2016-2016.jpg
 edgar-degas_study-of-horses.jpg
 gustav-klimt_cartoon-for-the-frieze-of-the-villa-stoclet-in-brussels-right-part-of-the-tree-of-life-1909.jpg
-theo-van-doesburg_qu%C3%A9rido-1910.jpg
+theo-van-doesburg_quérido-1910.jpg
 martiros-sarian_dogs-1910.jpg
 stanley-spencer_the-last-day.jpg
 stanislaw-wyspianski_autoportret-1890c.jpg
@@ -3993,7 +3993,7 @@ wilhelm-kotarbinski_wave-1.jpg
 camille-pissarro_hill-of-jallais-at-pontoise.jpg
 john-singer-sargent_peter-harrison-asleep.jpg
 martin-schongauer_wild-woman-with-shield-1490.jpg
-marcel-duchamp_female-fig-leaf-cover-design-for-le-surr%C3%A9alisme-1956.jpg
+marcel-duchamp_female-fig-leaf-cover-design-for-le-surréalisme-1956.jpg
 david-morier_grenadier-regents.jpg
 claude-monet_water-lilies-1919-6.jpg
 pieter-de-hooch_a-woman-and-a-child-on-a-bleichwiese.jpg
@@ -4131,7 +4131,7 @@ vincent-van-gogh_head-of-a-woman-16.jpg
 henri-fantin-latour_basket-of-flowers-1892.jpg
 antonio-sanfilippo_senza-titolo-senza-titolo-39-59.jpg
 jean-metzinger_le-bal-masqu-la-com-die-italienne-1924.jpg
-max-ernst_gala-%C3%A9luard-1924.jpg
+max-ernst_gala-éluard-1924.jpg
 max-liebermann_children-bathing-in-the-sea-1899.jpg
 gerard-van-honthorst_portrait-of-sophia-princess-palatine-sophia-of-hanover-1641.jpg
 konstantin-makovsky_the-transfer-of-the-sacred-carpet-from-mecca-to-cairo.jpg
@@ -4259,7 +4259,7 @@ edouard-manet_the-monk-at-prayer-1865.jpg
 marc-chagall_vitebsk-from-mount-zadunov-1917.jpg
 jules-breton_the-vintage-at-chateau-lagrange-1864.jpg
 janet-fish_chili-peppers-2005.jpg
-utagawa-kuniyoshi_onna-gy%C5%8Dja-japanese-actor.jpg
+utagawa-kuniyoshi_onna-gyōja-japanese-actor.jpg
 pino-pinelli_pittura-r-1993.jpg
 amedeo-modigliani_teresa-1915.jpg
 joachim-wtewael_mars-and-venus-discovered-by-the-gods-1604.jpg
@@ -4555,7 +4555,7 @@ frans-hals_man-with-hand-on-heart-1632.jpg
 ivan-kramskoy_portrait-of-a-woman-1.jpg
 pyotr-konchalovsky_pushkin-at-the-mikhailovsky.jpg
 frederic-edwin-church_new-england-scenery-detail-1851.jpg
-joaqu-n-sorolla_the-fountain-in-the-alc%C3%A1zof-seville-1908.jpg
+joaqu-n-sorolla_the-fountain-in-the-alcázof-seville-1908.jpg
 claude-monet_water-lilies-46.jpg
 jean-auguste-dominique-ingres_portrait-of-count-nikolay-gouriev-1821.jpg
 jean-metzinger_woman-with-a-coffee-pot-1919.jpg
@@ -4791,7 +4791,7 @@ jean-auguste-dominique-ingres_the-reverend-joseph-church.jpg
 martiros-sarian_flowers-1929.jpg
 paul-gauguin_view-of-the-beach-at-bellangenai-1889.jpg
 abraham-storck_havnescene-med-middelalderlig-bygning-1674.jpg
-joaqu-n-sorolla_gardens-of-the-alc%C3%A1zof-seville-in-wintertime-1908.jpg
+joaqu-n-sorolla_gardens-of-the-alcázof-seville-in-wintertime-1908.jpg
 camille-corot_portrait-of-a-man.jpg
 karoly-ferenczy_portrait-of-p-l-szinyei-merse-1910.jpg
 gustave-loiseau_cliffs-at-saint-jouin-1908.jpg
@@ -5180,7 +5180,7 @@ george-frederick-watts_portrait-of-mary-fraser-tytler-afterwards-mary-seton-watt
 gustave-dore_don-quixote-105.jpg
 andre-masson_landscape-with-rocks.jpg
 giovanni-battista-piranesi_psyche-pruned-to-heaven-by-love.jpg
-jean-auguste-dominique-ingres_portrait-of-napol%C3%A9on-bonaparte-the-first-council-1804.jpg
+jean-auguste-dominique-ingres_portrait-of-napoléon-bonaparte-the-first-council-1804.jpg
 sir-lawrence-alma-tadema_whispering-noon-1896.jpg
 istvan-farkas_fate-walking-at-the-water-tower-1934.jpg
 raphael_the-parnassus-from-the-stanza-delle-segnatura-detail-1511-3.jpg
@@ -5295,7 +5295,7 @@ pablo-picasso_artist-and-his-model-1926.jpg
 jean-michel-atlan_orient-1957.jpg
 john-ruskin_part-of-the-fa-ade-san-michele-lucca-1845.jpg
 gustav-klimt_portrait-of-a-girl.jpg
-albrecht-durer_endres-d%C3%BCrer-brother-of-the-painter-in-profile.jpg
+albrecht-durer_endres-dürer-brother-of-the-painter-in-profile.jpg
 piroska-szanto_peas-1986.jpg
 rudolf-schweitzer-cumpana_geamia-din-balcic.jpg
 pablo-picasso_the-buffet-of-catalan-1943.jpg
@@ -5404,7 +5404,7 @@ vincent-van-gogh_head-of-a-woman-with-her-hair-loose-1885.jpg
 alfred-sisley_along-the-woods-in-spring-1889.jpg
 andrew-wyeth_not-detected-36.jpg
 joan-hernandez-pijuan_untitled-1960.jpg
-ernst-ludwig-kirchner_the-caf%C3%A9.jpg
+ernst-ludwig-kirchner_the-café.jpg
 karl-bodmer_snags-on-the-missouri-river-1833.jpg
 alfred-sisley_sevres-bridge-1877.jpg
 carlos-saenz-de-tejada_sketch-of-decoration-for-the-ceiling-of-the-royal-mint-of-spain.jpg
@@ -5499,7 +5499,7 @@ cornelis-springer_figures-in-a-street-in-delft-1853.jpg
 jehan-georges-vibert_the-serenade.jpg
 charles-andre-van-loo-carle-van-loo_the-good-samaritian-1723.jpg
 james-rosenquist_shriek-1986.jpg
-robert-campin_the-m%C3%A9rode-altarpiece-the-donors-1428.jpg
+robert-campin_the-mérode-altarpiece-the-donors-1428.jpg
 samuel-peploe_royan-charente-inf-rieure-1910.jpg
 william-collins_children-gathering-seaweed.jpg
 william-orpen_the-big-crater-1917.jpg
@@ -6119,7 +6119,7 @@ yervand-kochar_the-girl-with-a-mandolin-1959.jpg
 allan-ramsay_portrait-of-jean-abercromby-mrs-morison.jpg
 le-pho_fruit-picking.jpg
 francis-bacon_woman-iv-1960.jpg
-rudolf-von-alt_the-town-hall-in-m%C3%B6dling-1842.jpg
+rudolf-von-alt_the-town-hall-in-mödling-1842.jpg
 jan-van-hemessen_jesus-summons-matthew-to-leave-the-tax-office.jpg
 george-bouzianis_portrait.jpg
 cy-twombly_nine-discourses-on-commodus-part-v.jpg
@@ -6160,7 +6160,7 @@ richard-wilson_summer-evening-caernarvon-castle-1765.jpg
 pieter-brueghel-the-younger_landliche-szene.jpg
 david-cox_penman-bach-1852.jpg
 paul-klee_captive-1940.jpg
-jacques-louis-david_the-arrival-at-the-h%C3%B4tel-de-ville.jpg
+jacques-louis-david_the-arrival-at-the-hôtel-de-ville.jpg
 pyotr-konchalovsky_still-life-lilac-against-the-stove-1954.jpg
 lyonel-feininger_woodblock-for-the-harbor-hafen-1918.jpg
 augustus-john_woman-in-a-landscape-1912.jpg
@@ -7288,7 +7288,7 @@ osman-hamdi_kokona-despina-1906.jpg
 fyodor-bronnikov_portrait-of-the-artist-s-mother-1871.jpg
 pablo-picasso_two-figures-1934.jpg
 ivan-albright_seaman.jpg
-pablo-picasso_caf%C3%A9-in-royan-1940.jpg
+pablo-picasso_café-in-royan-1940.jpg
 mstislav-dobuzhinsky_pskov-1923.jpg
 martiros-sarian_southern-winter-1934.jpg
 alexej-von-jawlensky_spanish-girl-1912.jpg
@@ -7363,7 +7363,7 @@ john-william-godward_far-away-thoughts-1892.jpg
 fyodor-bronnikov_bellagio-1875.jpg
 pyotr-konchalovsky_namur-france-1908.jpg
 claude-monet_the-water-lily-pond-x-1919.jpg
-pablo-picasso_man-and-woman-with-child-in-caf%C3%A9-1903.jpg
+pablo-picasso_man-and-woman-with-child-in-café-1903.jpg
 ilya-repin_refusal-of-confession-1.jpg
 jindrich-styrsky_cover-for-zamrizovane-zrcadlo-the-mirror-with-bars-1930.jpg
 raphael-kirchner_viennese-blood-1.jpg
@@ -8618,7 +8618,7 @@ camille-pissarro_the-banks-of-the-oise-at-pontoise-1870.jpg
 vasiliy-ryabchenko_kiss-furtively-1988.jpg
 elmer-bischoff_girl-looking-in-mirror-1962.jpg
 roger-weik_porcelain-2016-2016.jpg
-edgar-degas_edmond-and-th%C3%A9r%C3%A8se-morbilli-1867.jpg
+edgar-degas_edmond-and-thérèse-morbilli-1867.jpg
 johan-hendrik-weissenbruch_summer-day.jpg
 george-stubbs_soldiers-of-the-10th-dragoon-regiment.jpg
 roger-weik_convergence-1989.jpg
@@ -8918,7 +8918,7 @@ maurice-prendergast_low-tide-revere-beach.jpg
 edouard-manet_gypsy-with-a-cigarette.jpg
 leon-bakst_l-apres-midi-d-un-faune-a-nymph-1912.jpg
 albrecht-durer_portrait-of-african-woman-catherine.jpg
-bernardo-bellotto_wilan%C3%B3w-palace-seen-from-the-entrance-1776.jpg
+bernardo-bellotto_wilanów-palace-seen-from-the-entrance-1776.jpg
 edgar-degas_retiring-1883.jpg
 sloba-pajkovic_woman-on-the-beach-2019.jpg
 edgar-degas_dancer-arranging-her-hair.jpg
@@ -9372,7 +9372,7 @@ charles-spencelayh_an-old-master.jpg
 felix-labisse_la-demande-en-mariage-1929.jpg
 fons-heijnsbroek_september-1999-1-canvas-mirror-1999.jpg
 franz-sedlacek_evening-landscape-1933.jpg
-jean-auguste-dominique-ingres_hippolyte-fran%C3%A7ois-devillers.jpg
+jean-auguste-dominique-ingres_hippolyte-françois-devillers.jpg
 harry-clarke_the-year-s-at-the-spring-1920-29.jpg
 henri-martin_church-in-the-village-in-labastide-du-vert.jpg
 vasily-perov_portrait-of-an-unknown.jpg
@@ -9488,7 +9488,7 @@ mary-fedden_two-women-on-the-shore-1977.jpg
 thomas-gainsborough_rocky-coastal-scene-1781.jpg
 lyonel-feininger_the-kin-der-kids-japansky-surprises-the-governor-general-who-condemns-him-to-death-1906.jpg
 julius-bissier_komposition-7-m-rz-62-1962.jpg
-ferdinand-hodler_the-dents-blanches-in-champ%C3%A9ry-at-the-morning-sun-1916.jpg
+ferdinand-hodler_the-dents-blanches-in-champéry-at-the-morning-sun-1916.jpg
 fernand-leger_the-woman-and-the-child-1922.jpg
 elaine-de-kooning_charging-bull-no-7-1959.jpg
 pyotr-konchalovsky_siena-the-square-1912.jpg
@@ -10161,7 +10161,7 @@ rembrandt_the-small-lion-hunt-with-two-lions-1629.jpg
 boris-kustodiev_abbess-1901.jpg
 r-b-kitaj_bather-psychotic-boy.jpg
 josef-capek_devcata-na-kopci-1936.jpg
-ernst-ludwig-kirchner_caf%C3%A9-in-davos.jpg
+ernst-ludwig-kirchner_café-in-davos.jpg
 vincent-van-gogh_prayer-before-the-meal-1882.jpg
 edouard-cortes_rue-de-rivoli-2.jpg
 claude-monet_the-garden.jpg
@@ -10783,7 +10783,7 @@ pablo-picasso_head-of-a-girl-1950.jpg
 philipp-otto-runge_le-petit-perthes.jpg
 camille-pissarro_the-potato-harvest-1874.jpg
 jimmy-ernst_see-see-rider-1946.jpg
-eugene-boudin_channel-at-all%C3%A8e-verte-in-brussels-1871.jpg
+eugene-boudin_channel-at-allèe-verte-in-brussels-1871.jpg
 paul-gauguin_still-life-with-mangoes-and-hibiscus-1887.jpg
 quentin-matsys_portrait-of-an-old-man-1524.jpg
 camille-pissarro_sunset-at-eragny-1890.jpg
@@ -11266,8 +11266,8 @@ henry-scott-tuke_gleaming-waters-1910.jpg
 thomas-eakins_baby-at-play-1876.jpg
 fujishima-takeji_korean-woman-0.jpg
 james-ward_mrs-william-theobald-n-e-sarah-cooke-1832.jpg
-francisco-goya_queen-mar%C3%ADa-luisa-wearing-a-mantilla-1799.jpg
-francisco-goya_asensio-juli%C3%A1.jpg
+francisco-goya_queen-maría-luisa-wearing-a-mantilla-1799.jpg
+francisco-goya_asensio-juliá.jpg
 john-henry-twachtman_dark-trees-cincinnati.jpg
 salvador-dali_the-exterminating-angels.jpg
 spyros-papaloukas_skete-of-agios-andreas-1924.jpg
@@ -11795,7 +11795,7 @@ yayoi-kusama_infinity-net-1998.jpg
 martin-rico_paginas-artisticas-paisaje-de-venecia-1900.jpg
 theophile-steinlen_marche-des-bicyclistes-1895.jpg
 anthony-van-dyck_portrait-of-a-married-couple.jpg
-edouard-manet_the-model-for-the-bar-at-the-folies-berg%C3%A8re-1881.jpg
+edouard-manet_the-model-for-the-bar-at-the-folies-bergère-1881.jpg
 guido-reni_ecce-homo.jpg
 silvestro-lega_villa-reale-di-milano-1870.jpg
 aldo-mondino_untitled-2000.jpg
@@ -11882,7 +11882,7 @@ willem-de-kooning_composition.jpg
 ivan-aivazovsky_jesus-walks-on-water-1888-1.jpg
 pierre-auguste-renoir_albert-cahen-d-anvers-1881.jpg
 pablo-picasso_figure-1945.jpg
-leon-bakst_the-%D1%81arnival-estrella-1910-1.jpg
+leon-bakst_the-сarnival-estrella-1910-1.jpg
 titian_the-death-of-st-peter-martyr-1529.jpg
 haddon-sundbloom_an-arab-courtyard.jpg
 pierre-auguste-renoir_the-duck-pond-1873.jpg
@@ -11958,7 +11958,7 @@ egon-schiele_woman-in-a-green-blouse-and-muff-1915.jpg
 isaac-levitan_forest-sunny-day.jpg
 yiannis-tsaroychis_horseman-and-bather-with-house-1965.jpg
 rembrandt_mocking-of-christ.jpg
-albrecht-durer_portrait-albrecht-d%C3%BCrer-the-elder-1490.jpg
+albrecht-durer_portrait-albrecht-dürer-the-elder-1490.jpg
 eyvind-earle_purple-coastline-1996.jpg
 francesco-de-rossi-francesco-salviati_portrait-of-a-young-man-1548.jpg
 henry-ossawa-tanner_the-resurrection-of-lazarus-1896.jpg
@@ -12013,7 +12013,7 @@ william-turner_conway-castle.jpg
 theodor-severin-kittelsen_december-1890.jpg
 ernst-ludwig-kirchner_three-women-in-a-cafe.jpg
 mikalojus-ciurlionis_bridges-1905.jpg
-bernardo-bellotto_new-market-square-in-dresden-from-the-j%C3%BCdenhof.jpg
+bernardo-bellotto_new-market-square-in-dresden-from-the-jüdenhof.jpg
 albrecht-durer_the-holy-georg.jpg
 josef-capek_the-african-king.jpg
 aleksey-ivanovich-korzukhin_in-the-monastery-hotel-1882.jpg
@@ -13955,7 +13955,7 @@ nicholas-roerich_sacrificer-1913.jpg
 hieronymus-bosch_mankind-beset-by-devils-reverse-of-rebel-angels-panel-1504.jpg
 giovanni-battista-piranesi_ancient-temple-invented-and-designed-in-the-manner-of-those-that-were-manufactured-in-honor-of.jpg
 palma-il-giovane_crucifixion-detail-1579-0.jpg
-edvard-munch_l%C3%BCbeck-harbour-with-the-holstentor-1907.jpg
+edvard-munch_lübeck-harbour-with-the-holstentor-1907.jpg
 francois-boucher_hercuse-and-omfala-1735.jpg
 john-constable_the-stour-valley-with-the-church-of-dedham-1814.jpg
 alfred-parsons_ash-trees-at-cropthorne-worcestershire.jpg
@@ -14087,7 +14087,7 @@ istvan-ilosvai-varga_self-portrait-1932.jpg
 karl-bryullov_the-last-day-of-pompeii-2-1830.jpg
 thomas-gainsborough_portrait-of-the-molly-and-peggy.jpg
 paul-nash_landscape-composition-objects-in-relation-1934.jpg
-lucas-cranach-the-elder_georg-der-b%C3%A4rtige-duke-of-saxony-1.jpg
+lucas-cranach-the-elder_georg-der-bärtige-duke-of-saxony-1.jpg
 jeremy-henderson_nature-of-nature-230-017-2004.jpg
 giovanni-battista-piranesi_the-roman-antiquities-t-2-plate-ix-plan-of-the-burial-chambers-of-liberti-and-family-l-arrunzio-1756.jpg
 henri-matisse_odalisque-with-gray-pants-1927.jpg
@@ -14145,7 +14145,7 @@ max-weber_the-visit.jpg
 akkitham-narayanan_a-print-from-saundarya-lahiri-1974-2.jpg
 joseph-farquharson_sheep-in-a-snowstorm-1893.jpg
 john-ferren_untitled-1956.jpg
-francisco-goya_poet-morat%C3%ADn-1824.jpg
+francisco-goya_poet-moratín-1824.jpg
 luis-feito_n-mero-460-a-1963.jpg
 thomas-lawrence_matthew-baillie-1806.jpg
 claude-viallat_unknown-title-1.jpg
@@ -14176,7 +14176,7 @@ jacek-yerka_ink-valley-2012.jpg
 berthe-morisot_english-seascape.jpg
 marc-chagall_circus.jpg
 lynd-ward_not-detected-272461.jpg
-albrecht-durer_traumgesicht-d%C3%BCrer-dokumentiert-einen-seiner-albtr%C3%A4ume-1525.jpg
+albrecht-durer_traumgesicht-dürer-dokumentiert-einen-seiner-albträume-1525.jpg
 filippo-lippi_the-funeral-of-st-stephen-detail.jpg
 robert-julian-onderdonk_in-the-hills-southwest-texas-1912.jpg
 paul-jacoulet_m-keen-et-m-lee-seoul-coree-1951.jpg
@@ -14201,7 +14201,7 @@ utagawa-kuniyoshi_the-actor-16.jpg
 anton-melbye_the-sailing-ship-johanna-and-other-vessels-in-sundet-off-kronborg-castle-1849.jpg
 niko-pirosmani_tapestry-in-six-paintings.jpg
 odilon-redon_portrait-of-ari-redon.jpg
-jean-auguste-dominique-ingres_portrait-of-madame-aymon-la-belle-z%C3%A9lie-1806.jpg
+jean-auguste-dominique-ingres_portrait-of-madame-aymon-la-belle-zélie-1806.jpg
 thomas-dewing_the-spinet-1902.jpg
 maxime-maufra_the-embankment-of-lagny-under-flood-water-1908.jpg
 konstantin-korovin_sebastopol-winter-1916.jpg
@@ -14658,7 +14658,7 @@ john-vassos_illustration-for-oscar-wilde-s-salome-1927-2.jpg
 paul-gauguin_bouquet-of-flowers.jpg
 carlos-saenz-de-tejada_untitled.jpg
 marc-chagall_on-the-tramp-1962.jpg
-francisco-goya_antonia-z%C3%A1rate.jpg
+francisco-goya_antonia-zárate.jpg
 carle-vernet_cheval-mamelouk.jpg
 william-orpen_sir-edwin-ray-lankester-1928.jpg
 ronnie-landfield_taurean-entrance-1973.jpg
@@ -15303,7 +15303,7 @@ george-romney_john-wesley-1703-1791-1789.jpg
 martiros-sarian_lori-1953.jpg
 william-turner_archway-with-trees-by-the-sea.jpg
 morris-louis_blue-veil-1958.jpg
-albrecht-durer_the-trefiler%C3%ADa-on-peignitz-1.jpg
+albrecht-durer_the-trefilería-on-peignitz-1.jpg
 george-bouzianis_self-portrait-2.jpg
 christopher-wood_flowers-1930.jpg
 ferdinand-hodler_warrior-figures-from-the-rear-and-front.jpg
@@ -15470,7 +15470,7 @@ jose-maria-velasco_vista-de-la-monta-a-del-ajusco-y-pueblo-de-san-ngel-desde-la-
 maria-fortuny_pareja-de-pierrots.jpg
 marc-chagall_the-creation-of-man.jpg
 georges-braque_cafe-bar-1919.jpg
-gustave-courbet_the-cliffs-at-%C3%A9treat-1866.jpg
+gustave-courbet_the-cliffs-at-étreat-1866.jpg
 sergio-illuminato_universe-universo-univers-2019.jpg
 sandro-botticelli_st-jerome.jpg
 henri-martin_versailles.jpg
@@ -15650,7 +15650,7 @@ james-tissot_the-egyptians-admire-sarai-s-beauty.jpg
 vasily-tropinin_zagoskin-michael.jpg
 james-tissot_abraham-sees-sodom-in-flames.jpg
 gino-severini_harlequins-1954.jpg
-katsushika-hokusai_%C5%8Dnmyo-imoseyama.jpg
+katsushika-hokusai_ōnmyo-imoseyama.jpg
 carl-ludwig-johann-christineck_natalia-ozerova.jpg
 camille-pissarro_picking-peas-1880.jpg
 giovanni-battista-piranesi_genius-of-apollo.jpg
@@ -15727,7 +15727,7 @@ john-singer-sargent_schooner-catherine-somesville-maine.jpg
 hans-holbein-the-younger_portrait-of-henry-viii-1540.jpg
 nathan-oliveira_the-silent-runner-2001.jpg
 john-leech_the-underground-railways.jpg
-gustave-dore_%D1%81orrida-1860.jpg
+gustave-dore_сorrida-1860.jpg
 joshua-reynolds_elizabeth-duchess-of-hamilton-and-argyll-1759.jpg
 claude-monet_the-bodmer-oak.jpg
 petrus-christus_the-death-of-the-virgin.jpg
@@ -16506,7 +16506,7 @@ patrick-procktor_sadie-and-prudence-from-invitation-to-a-voyage-portfolio-of-5-a
 edmund-dulac_such-stuff-as-dreams-are-made-on-from-the-tempest.jpg
 kay-nielsen_the-tinder-box.jpg
 pyotr-konchalovsky_torso-of-young-men-1936.jpg
-gustav-klimt_portrait-of-emilie-fl%C3%B6ge-1.jpg
+gustav-klimt_portrait-of-emilie-flöge-1.jpg
 daniel-ridgway-knight_reverie-1866.jpg
 gandy-brodie_anemonie-in-rusted-can-1975.jpg
 clara-peeters_still-life-1607.jpg
@@ -16626,7 +16626,7 @@ avigdor-arikha_mount-zion-1976.jpg
 pierre-auguste-renoir_laundry-boat-by-the-banks-of-the-seine-near-paris-1873.jpg
 giovanni-domenico-tiepolo_the-walk.jpg
 theo-van-rysselberghe_roger-martin-du-gard-1926.jpg
-jan-matejko_stanis%C5%82aw-august-poniatowski.jpg
+jan-matejko_stanisław-august-poniatowski.jpg
 constant-troyon_path-in-a-small-wood.jpg
 jan-dirksz-both_landscape-with-a-draftsman-1645-0.jpg
 rembrandt_beggars-on-the-doorstep-of-a-house-1648.jpg
@@ -16970,7 +16970,7 @@ theophile-steinlen_the-departure-1751.jpg
 marc-chagall_three-nudes-1984.jpg
 pietro-da-cortona_the-age-of-gold.jpg
 giovanni-battista-gaulli_morte-di-adone.jpg
-pablo-picasso_portrait-of-marie-th%C3%A9r%C3%A8se-walter-1937-1.jpg
+pablo-picasso_portrait-of-marie-thérèse-walter-1937-1.jpg
 federico-zandomeneghi_the-cafe-1884.jpg
 bernardo-bellotto_venice-veduta-1.jpg
 erte_lafayette.jpg
@@ -17357,7 +17357,7 @@ pat-lipsky_for-leslie-1974.jpg
 agnes-martin_untitled-1980.jpg
 gustave-buchet_portrait-de-charles-chinet-1917-0.jpg
 john-hoppner_the-hon-alicia-herbert-as-a-child-1795.jpg
-jean-auguste-dominique-ingres_madame-and-her-son-laur%C3%A9al.jpg
+jean-auguste-dominique-ingres_madame-and-her-son-lauréal.jpg
 ivan-aivazovsky_view-on-lagoon-of-venice-1841.jpg
 claude-monet_the-rocks-of-belle-lle.jpg
 gustave-de-smet_grazing-cow-1935.jpg
