@@ -31,7 +31,7 @@ def main(images_dir, processed_data_dir):
 
     clip_embeddings_path = processed_data_dir / "clip_embeddings.npy"
     np.save(clip_embeddings_path, embeddings)
-    logger.info(f"CLIP embeddings created at {clip_embeddings_path}!")
+    logger.info(f"CLIP embeddings created at {clip_embeddings_path}")
 
 
 
