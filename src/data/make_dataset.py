@@ -45,7 +45,7 @@ def clean_dataset(df, min_label_count):
     # set to NA artists with less than min_label_count appearances
     artists_df = df.groupby(["artist"]).count().reset_index()
     valid_artists = set(
-        artists_df[artists_df["image"] >= min_label_count]["artist"].values
+        artists_df[~artists_df["image"] >= min_label_count]["artist"].values
     )
     df.loc[df["artist"].isin(valid_artists), "artist"] = pd.NA
 
@@ -105,7 +105,7 @@ def main(min_label_count, input_dir, output_dir):
             logger.error(
                 f"can't create the {split} split directory, delete it if it already exists"
             )
-        
+
         logger.info(f"copying images for {split} split")
         for filename in tqdm(filenames):
             shutil.copy(images_dir / filename, split_dir / filename)
@@ -113,7 +113,7 @@ def main(min_label_count, input_dir, output_dir):
 
         logger.info("making metadata")
         split_df = df[df["image"].isin(filenames)]
-        split_df = split_df.rename({"image": "file_name"})
+        split_df = split_df.rename(columns={"image": "file_name"})
 
         split_df.to_csv(split_dir / "metadata.csv", index=False)
         logger.info(f"{split} set created")
