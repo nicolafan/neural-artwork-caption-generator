@@ -5,7 +5,7 @@ from sklearn.utils.class_weight import compute_class_weight
 from transformers import ViTImageProcessor
 import torch
 
-from src.utils import get_data_dir
+from src.utils.dirutils import get_data_dir
 
 MULTICLASS_FEATURES = ("artist", "style", "genre")
 MULTILABEL_FEATURES = ("tags", "media")
