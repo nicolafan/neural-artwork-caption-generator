@@ -1,11 +1,11 @@
-from transformers import TrainerCallback, TrainingArguments, Trainer
+import torch
+from transformers import Trainer, TrainerCallback, TrainingArguments
 from transformers.integrations import TensorBoardCallback
 
-import torch
 import src.models.multiclassification.data as data
-from src.utils.dirutils import get_models_dir
-from src.models.multiclassification.model import ViTForMultiClassification
 from src.models.multiclassification.metrics import compute_metrics
+from src.models.multiclassification.model import ViTForMultiClassification
+from src.utils.dirutils import get_models_dir
 
 MODEL_OUTPUT_DIR = get_models_dir() / "multiclassification" / "vit_base_patch16_224"
 
@@ -58,7 +58,10 @@ def train():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     dataset = data.get_dataset_for_multiclassification()
-    dataset.set_format(type='torch', columns=["pixel_values", "artist", "style", "genre", "tags", "media"])
+    dataset.set_format(
+        type="torch",
+        columns=["pixel_values", "artist", "style", "genre", "tags", "media"],
+    )
 
     training_args = TrainingArguments(
         output_dir=MODEL_OUTPUT_DIR,
