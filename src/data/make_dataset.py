@@ -6,7 +6,12 @@ from pathlib import Path
 
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
+from joblib import dump
+from PIL import Image
 from tqdm import tqdm
+
+from src.data.prepare_dataset import \
+    get_prepared_dataset_for_multiclassification
 
 
 def _get_valid_labels(df, col, min_label_count):
@@ -33,21 +38,21 @@ def _get_valid_labels(df, col, min_label_count):
 
 
 def clean_dataset(df, min_label_count):
-    """Clean the dataframe
+    """Clean the dataframe, by keeping only valid labels and classes that appear at least min_label_count times
 
     Args:
-        df (_type_): _description_
-        min_label_count (_type_): _description_
+        df (pandas.DataFrame): dataset
+        min_label_count (int): min number of appearances for label/class
 
     Returns:
-        _type_: _description_
+        pandas.DataFrame: the dataset that only keeps valid labels/classes
     """
     # set to NA artists with less than min_label_count appearances
     artists_df = df.groupby(["artist"]).count().reset_index()
     valid_artists = set(
-        artists_df[~artists_df["image"] >= min_label_count]["artist"].values
+        artists_df[artists_df["image"] >= min_label_count]["artist"].values
     )
-    df.loc[df["artist"].isin(valid_artists), "artist"] = pd.NA
+    df.loc[~df["artist"].isin(valid_artists), "artist"] = pd.NA
 
     def keep_valid_labels(x, valid_labels):
         if not pd.notnull(x):
@@ -71,26 +76,15 @@ def clean_dataset(df, min_label_count):
     return df
 
 
-def main(min_label_count, input_dir, output_dir):
-    """Runs data processing scripts to turn raw data from (../raw) into
-    cleaned data ready to be analyzed (saved in ../processed).
+def make_imagefolder_dataset(df, input_dir, output_dir, logger):
+    """Make an imagefolder dataset (for hf) with df metadata and the images in input_dir
+
+    Args:
+        df (pandas.DataFrame): dataset
+        input_dir (Path): directory containing the images dir and splits info
+        output_dir (Path): where to store the splits
+        logger (Logger): logger
     """
-    logger = logging.getLogger(__name__)
-    logger.info("making classification data set from raw data")
-
-    # read and clean the dataset
-    df = pd.read_csv(input_dir / "artgraph_dataset.csv")
-    df = clean_dataset(df, min_label_count)
-
-    # read the caption dataset
-    captions_df = pd.read_csv(input_dir / "artgraph_captions.csv")
-
-    # merge the datasets
-    df = df.merge(captions_df, how="left", on="image")
-    df = df.drop(columns="name")
-
-    logger.info("full dataset created")
-
     # create splits
     images_dir = input_dir / "images"
     splits = ("train", "test", "val")
@@ -108,7 +102,11 @@ def main(min_label_count, input_dir, output_dir):
 
         logger.info(f"copying images for {split} split")
         for filename in tqdm(filenames):
-            shutil.copy(images_dir / filename, split_dir / filename)
+            image = Image.open(images_dir / filename)
+            if image.mode == "RGBA" or image.mode == "P":
+                image = image.convert("RGB")
+            # Save the converted image to the output directory
+            image.save(split_dir / filename)
         logger.info("images copied")
 
         logger.info("making metadata")
@@ -121,16 +119,62 @@ def main(min_label_count, input_dir, output_dir):
     logger.info(f"dataset created at {output_dir}")
 
 
+def main(min_label_count, input_dir, interim_dir, output_dir):
+    """Runs data processing scripts to turn raw data from (../raw) into
+    cleaned data ready to be analyzed (saved in ../processed).
+    """
+    logger = logging.getLogger(__name__)
+    logger.info("making classification data set from raw data")
+
+    # read and clean the dataset
+    df = pd.read_csv(input_dir / "artgraph_dataset.csv")
+    df = clean_dataset(df, min_label_count)
+
+    # read the caption dataset
+    captions_df = pd.read_csv(input_dir / "artgraph_captions.csv")
+
+    # merge the datasets
+    df = df.merge(captions_df, how="left", on="image")
+    df = df.drop(columns="name")
+
+    logger.info("full dataset merged")
+
+    make_imagefolder_dataset(df, input_dir, interim_dir, logger)
+    logger.info("imagefolder interim dataset created")
+
+    dataset, ordinal_encoders, multilabel_binarizers = get_prepared_dataset_for_multiclassification(interim_dir)
+
+    dataset.save_to_disk(output_dir / "multiclassification_dataset")
+    logger.info("hf multiclassification dataset saved")
+
+    os.makedirs(output_dir / "ordinal_encoders", exist_ok=True)
+    for feature, encoder in ordinal_encoders.items():
+        dump(encoder, output_dir / "ordinal_encoders" / f"{feature}.joblib")
+    logger.info("saved ordinal encoders")
+
+    os.makedirs(output_dir / "multilabel_binarizers", exist_ok=True)
+    for feature, binarizer in multilabel_binarizers.items():
+        dump(binarizer, output_dir / "multilabel_binarizers" / f"{feature}.joblib")
+    logger.info("saved multilabel binarizers")
+
+    for split in "train", "test", "val":
+        shutil.rmtree(interim_dir / split)
+    logger.info("deleted interim dataset")
+
+    logger.info("process completed, you can now load the hf dataset")
+
+
 if __name__ == "__main__":
     log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     project_dir = Path(__file__).resolve().parents[2]
     raw_data_dir = project_dir / "data" / "raw"
+    interim_data_dir = project_dir / "data" / "interim"
     processed_data_dir = project_dir / "data" / "processed"
 
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
 
-    main(100, raw_data_dir, processed_data_dir)
+    main(100, raw_data_dir, interim_data_dir, processed_data_dir)
