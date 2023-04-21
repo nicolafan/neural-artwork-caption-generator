@@ -7,18 +7,23 @@ from transformers import ViTModel
 # custom loss for multilabel classification, ignore elements that have 0 labels
 def binary_cross_entropy_with_logits_ignore_no_labels(preds, targets):
     zero_labels = torch.sum(targets, dim=1) == 0
-    targets = targets.float() # remove this in the future
+    targets = targets.float()  # remove this in the future
 
     # Apply BCEWithLogitsLoss only to non-zero labels
-    loss = F.binary_cross_entropy_with_logits(preds, targets, reduction='none')
+    loss = F.binary_cross_entropy_with_logits(preds, targets, reduction="none")
     loss = torch.where(zero_labels.unsqueeze(1), torch.zeros_like(loss), loss)
     loss = torch.mean(loss)
-    
+
     return loss
 
 
 class ViTForMultiClassification(nn.Module):
-    def __init__(self, multiclass_classifications: dict[str, int], multilabel_classifications: dict[str, int], multiclass_class_weights: dict[str, torch.Tensor]):
+    def __init__(
+        self,
+        multiclass_classifications: dict[str, int],
+        multilabel_classifications: dict[str, int],
+        multiclass_class_weights: dict[str, torch.Tensor],
+    ):
         """Initialize a ViTForMultiClassification model for multi-classification and multi-label classification.
 
         Args:
@@ -34,25 +39,35 @@ class ViTForMultiClassification(nn.Module):
         self.vit = ViTModel.from_pretrained("google/vit-base-patch16-224")
 
         # initialize classification heads
-        self.multiclass_fcs = nn.ModuleList([
-            nn.Linear(self.vit.config.hidden_size, num_classes)
-            for num_classes
-            in multiclass_classifications.values()
-        ])
-        self.multilabel_fcs = nn.ModuleList([
-            nn.Linear(self.vit.config.hidden_size, num_classes)
-            for num_classes
-            in multilabel_classifications.values()
-        ])
+        self.multiclass_fcs = nn.ModuleList(
+            [
+                nn.Linear(self.vit.config.hidden_size, num_classes)
+                for num_classes in multiclass_classifications.values()
+            ]
+        )
+        self.multilabel_fcs = nn.ModuleList(
+            [
+                nn.Linear(self.vit.config.hidden_size, num_classes)
+                for num_classes in multilabel_classifications.values()
+            ]
+        )
 
         # initialize losses as a list with 5 0s
         self.losses = [0] * 5
         # loss weights
-        self.loss_w = nn.Parameter(
-            torch.ones(5, dtype=torch.float32, requires_grad=True)
+        self.log_vars = nn.Parameter(
+            torch.zeros(5, dtype=torch.float32, requires_grad=True)
         )
 
-    def compute_losses(self, logits: tuple[torch.Tensor], artist: torch.Tensor, style: torch.Tensor, genre: torch.Tensor, tags: torch.Tensor, media: torch.Tensor):
+    def compute_losses(
+        self,
+        logits: tuple[torch.Tensor],
+        artist: torch.Tensor,
+        style: torch.Tensor,
+        genre: torch.Tensor,
+        tags: torch.Tensor,
+        media: torch.Tensor,
+    ):
         """Compute loss for multi-classification and multi-label classification.
 
         Args:
@@ -70,13 +85,20 @@ class ViTForMultiClassification(nn.Module):
 
         for i, labels in enumerate([artist, style, genre]):
             feature = list(self.multiclass_classifications.keys())[i]
-            loss = F.cross_entropy(logits[i], labels.squeeze(), weight=self.multiclass_class_weights[feature], ignore_index=-1)
+            loss = F.cross_entropy(
+                logits[i],
+                labels.squeeze(),
+                weight=self.multiclass_class_weights[feature],
+                ignore_index=-1,
+            )
             if torch.isnan(loss):
                 loss = 0
             losses.append(loss)
 
         for i, labels in enumerate([tags, media]):
-            loss = binary_cross_entropy_with_logits_ignore_no_labels(logits[i + 3], labels)
+            loss = binary_cross_entropy_with_logits_ignore_no_labels(
+                logits[i + 3], labels
+            )
             if torch.isnan(loss):
                 loss = 0
             losses.append(loss)
@@ -86,36 +108,49 @@ class ViTForMultiClassification(nn.Module):
             self.losses[i] += loss if isinstance(loss, int) else loss.item()
 
         return losses
-    
-    def compute_loss(self, logits: tuple[torch.Tensor], artist: torch.Tensor, style: torch.Tensor, genre: torch.Tensor, tags: torch.Tensor, media: torch.Tensor):
+
+    def compute_loss(
+        self,
+        logits: tuple[torch.Tensor],
+        artist: torch.Tensor,
+        style: torch.Tensor,
+        genre: torch.Tensor,
+        tags: torch.Tensor,
+        media: torch.Tensor,
+    ):
         """Compute weighted loss.
 
         Args:
-            losses (torch.Tensor): list of losses
+            logits (tuple[torch.Tensor]): tuple of logits
+            artist (torch.Tensor): artist tensor
+            style (torch.Tensor): style tensor
+            genre (torch.Tensor): genre tensor
+            tags (torch.Tensor): tags tensor
+            media (torch.Tensor): media tensor
 
         Returns:
             torch.Tensor: weighted loss
         """
         losses = self.compute_losses(logits, artist, style, genre, tags, media)
-        eps = 1e-8
-        weighted_losses = []
-        loss = 0
 
-        for i, loss in enumerate(losses):
-            weighted_loss = loss / (self.loss_w[i]**2 + eps)
-            weighted_losses.append(weighted_loss)
+        # Compute weighted losses
+        weighted_losses = [
+            loss / (torch.exp(-self.log_vars[i])) for i, loss in enumerate(losses)
+        ]
 
-        # set regularizer to sum of log of loss weights plus eps
-        regularizer = torch.sum(torch.log(self.loss_w + eps))
+        # Compute regularizer as sum of log of loss weights plus eps
+        regularizer = torch.sum(torch.log(self.log_vars / 2))
 
-        # sum the list of weighted losses
+        # Sum the list of weighted losses
         loss = torch.sum(torch.stack(weighted_losses)) + regularizer
-        return loss
-        
 
-    def forward(self, pixel_values, artist=None, style=None, genre=None, tags=None, media=None):
+        return loss
+
+    def forward(
+        self, pixel_values, artist=None, style=None, genre=None, tags=None, media=None
+    ):
         """Forward pass for ViTForMultiClassification model.
-        
+
         Args:
             pixel_values (torch.Tensor): pixel values of the images
             artist (torch.Tensor, optional): artist labels. Defaults to None.
@@ -126,17 +161,11 @@ class ViTForMultiClassification(nn.Module):
         """
         x = self.vit(pixel_values=pixel_values).pooler_output
 
-        multiclass_logits = tuple(
-            fc(x)
-            for fc in self.multiclass_fcs
-        )
-        multilabel_logits = tuple(
-            fc(x)
-            for fc in self.multilabel_fcs
-        )
+        multiclass_logits = tuple(fc(x) for fc in self.multiclass_fcs)
+        multilabel_logits = tuple(fc(x) for fc in self.multilabel_fcs)
 
         logits = multiclass_logits + multilabel_logits
-        
+
         # compute loss if labels are provided
         if artist is not None:
             loss = self.compute_loss(logits, artist, style, genre, tags, media)
