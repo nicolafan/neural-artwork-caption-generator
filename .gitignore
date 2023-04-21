@@ -79,6 +79,9 @@ target/
 # exclude data from source control by default
 /data/
 
+# exclude models by default
+/models/multiclassification/
+
 # Mac OS-specific storage files
 .DS_Store
 

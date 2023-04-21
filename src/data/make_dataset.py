@@ -3,6 +3,7 @@ import os
 import shutil
 from collections import Counter
 from pathlib import Path
+import click
 
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
@@ -10,6 +11,7 @@ from joblib import dump
 from PIL import Image
 from tqdm import tqdm
 
+from src.utils.dirutils import get_data_dir
 from src.data.prepare_dataset import \
     get_prepared_dataset_for_multiclassification
 
@@ -119,10 +121,17 @@ def make_imagefolder_dataset(df, input_dir, output_dir, logger):
     logger.info(f"dataset created at {output_dir}")
 
 
-def main(min_label_count, input_dir, interim_dir, output_dir):
+# use click to pass the integer min_label_count as an argument
+@click.command()
+@click.option("--min_label_count", type=int, default=100, help="min label count to keep a label")
+def main(min_label_count):
     """Runs data processing scripts to turn raw data from (../raw) into
     cleaned data ready to be analyzed (saved in ../processed).
     """
+    input_dir = get_data_dir() / "raw"
+    interim_dir = get_data_dir() / "interim"
+    output_dir = get_data_dir() / "processed"
+
     logger = logging.getLogger(__name__)
     logger.info("making classification data set from raw data")
 
@@ -168,13 +177,8 @@ if __name__ == "__main__":
     log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
-    project_dir = Path(__file__).resolve().parents[2]
-    raw_data_dir = project_dir / "data" / "raw"
-    interim_data_dir = project_dir / "data" / "interim"
-    processed_data_dir = project_dir / "data" / "processed"
-
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
 
-    main(100, raw_data_dir, interim_data_dir, processed_data_dir)
+    main()

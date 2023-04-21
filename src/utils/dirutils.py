@@ -4,7 +4,7 @@ from pathlib import Path
 def get_project_dir():
     """Returns the path to the project directory."""
     # return parent of parent of current file as pathlib Path
-    return Path(__file__).parent.parent
+    return Path(__file__).parent.parent.parent
 
 
 def get_data_dir():
