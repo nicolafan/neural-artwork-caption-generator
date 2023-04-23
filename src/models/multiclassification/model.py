@@ -71,6 +71,15 @@ class ViTForMultiClassification(nn.Module):
         else:
             self.log_vars = None
 
+    def toggle_freeze(self, freeze: bool):
+        """Toggle freeze/unfreeze of the ViT model.
+
+        Args:
+            freeze (bool): freeze or unfreeze
+        """
+        for param in self.vit.parameters():
+            param.requires_grad = not freeze
+
     def compute_losses(
         self,
         logits: tuple[torch.Tensor],

@@ -5,7 +5,6 @@ from sklearn.metrics import (
     recall_score,
     f1_score,
     hamming_loss,
-    log_loss,
 )
 import src.models.multiclassification.data as data
 

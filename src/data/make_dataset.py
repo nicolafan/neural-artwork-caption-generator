@@ -122,6 +122,11 @@ def make_imagefolder_dataset(df, input_dir, output_dir, logger):
         # create metadata
         split_df = df[df["image"].isin(filenames)]
         split_df = split_df.rename(columns={"image": "file_name"})
+
+        # sort the split_df by keeping the order in the split file
+        split_df = split_df.sort_values(by='file_name', key=lambda x: x.map({v: i for i, v in enumerate(filenames)}))
+        split_df = split_df.reset_index(drop=True)
+
         logger.info("metadata created")
 
         # save metadata

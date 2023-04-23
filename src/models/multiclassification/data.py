@@ -1,5 +1,5 @@
 import numpy as np
-from datasets import load_from_disk
+from datasets import Dataset, load_from_disk
 from joblib import load
 from sklearn.utils.class_weight import compute_class_weight
 from transformers import ViTImageProcessor
@@ -17,7 +17,7 @@ def get_dataset_for_multiclassification():
     Returns:
         dataset (datasets.Dataset): dataset for multiclassification
     """
-    dataset = load_from_disk(
+    dataset: Dataset = load_from_disk(
         get_data_dir() / "processed" / "multiclassification_dataset"
     )
     processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
@@ -29,6 +29,9 @@ def get_dataset_for_multiclassification():
         return examples
 
     dataset = dataset.map(process, remove_columns="image", batched=True)
+
+    # shuffle the dataset with random_state=42
+    dataset = dataset.shuffle(seed=42)
     return dataset
 
 
