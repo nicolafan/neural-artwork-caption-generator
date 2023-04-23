@@ -8,13 +8,20 @@ from PIL import Image
 from tqdm import tqdm
 from transformers import CLIPModel, CLIPProcessor
 
+from src.utils.dirutils import get_data_dir
+
 
 def main(images_dir, output_dir):
-    """Compute CLIP embeddings for images in dir
+    """Creates CLIP embeddings for images in images_dir and saves them to
+    output_dir.
+
+    The order of the embeddings corresponds to the order of the filenames
+    returned by os.listdir(images_dir).
+    The first embedding must be discarded as it is a dummy embedding.
 
     Args:
-        images_dir (Path): directory containing images
-        output_dir (Path): directory where to store the embeddings
+        images_dir (Path): Path to directory containing images.
+        output_dir (Path): Path to directory where CLIP embeddings will be saved.
     """
     logger = logging.getLogger(__name__)
     logger.info(f"creating CLIP embeddings for images in {images_dir}")
@@ -50,9 +57,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
-    images_dir = project_dir / "data" / "raw" / "images"
-    processed_data_dir = project_dir / "data" / "processed"
+    data_dir = get_data_dir()
+    images_dir = data_dir / "raw" / "images"
+    processed_data_dir = data_dir / "processed"
 
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables
