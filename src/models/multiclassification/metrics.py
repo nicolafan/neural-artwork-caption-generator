@@ -88,4 +88,10 @@ def compute_metrics(eval_pred):
         metrics[f"{feature}_macro_recall"] = recall
         metrics[f"{feature}_macro_f1"] = f1
 
+    avg_macro_f1 = 0
+    for feature in data.MULTICLASS_FEATURES + data.MULTILABEL_FEATURES:
+        avg_macro_f1 += metrics[f"{feature}_macro_f1"]
+    avg_macro_f1 /= len(data.MULTICLASS_FEATURES + data.MULTILABEL_FEATURES)
+    metrics["avg_macro_f1"] = avg_macro_f1
+
     return metrics

@@ -1,5 +1,5 @@
 import torch
-from transformers import Trainer, TrainerCallback, TrainingArguments
+from transformers import Trainer, TrainerCallback, TrainingArguments, EarlyStoppingCallback
 from transformers.integrations import TensorBoardCallback
 
 import src.models.multiclassification.data as data
@@ -7,15 +7,21 @@ from src.models.multiclassification.metrics import compute_metrics
 from src.models.multiclassification.model import ViTForMultiClassification
 from src.utils.dirutils import get_models_dir
 
-MODEL_OUTPUT_DIR = get_models_dir() / "multiclassification" / "vit_base_patch16_224"
+MODEL_OUTPUT_DIR = get_models_dir() / "multiclassification" / "pretrain"
 
 
 class CustomTensorBoardCallback(TensorBoardCallback):
+    """Custom TensorBoard callback.
+    """
     def __init__(self, *args, **kwargs):
+        """Initialize CustomTensorBoardCallback.
+        """
         super().__init__(*args, **kwargs)
         self.last_step = -1
 
     def on_log(self, args, state, control, logs=None, **kwargs):
+        """Log metrics to TensorBoard.
+        """
         super().on_log(args, state, control, logs, **kwargs)
         if self.last_step == state.global_step: # skip if already logged
             return
@@ -50,12 +56,16 @@ class CustomTensorBoardCallback(TensorBoardCallback):
 
 
 class ResetLossesCallback(TrainerCallback):
-    def on_epoch_end(self, args, state, control, **kwargs):
+    """Reset losses callback.
+    """
+    def on_epoch_start(self, args, state, control, **kwargs):
         model = kwargs["model"]
         model.losses_epoch_sum = [0] * 5
 
 
 def train():
+    """Train model.
+    """
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     dataset = data.get_dataset_for_multiclassification()
@@ -63,16 +73,21 @@ def train():
     training_args = TrainingArguments(
         output_dir=MODEL_OUTPUT_DIR,
         label_names=list(data.MULTICLASS_FEATURES + data.MULTILABEL_FEATURES),
-        evaluation_strategy="steps",
-        eval_steps=30,
-        logging_strategy="steps",
-        logging_steps=30,
+        evaluation_strategy="epoch",
+        logging_strategy="epoch",
+        save_strategy="epoch",
+        seed=42,
+        load_best_model_at_end=True,
+        metric_for_best_model="avg_macro_f1",
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
     )
 
     model = ViTForMultiClassification(
         *data.get_multiclassification_dicts(), data.compute_class_weight_tensors(dataset, device)
     )
     model.to(device)
+    model.freeze_base_model(True)
 
     dataset.set_format(
         type="torch",
@@ -82,10 +97,10 @@ def train():
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=dataset["train"].select(range(200)),
-        eval_dataset=dataset["validation"].select(range(200)),
+        train_dataset=dataset["train"],
+        eval_dataset=dataset["validation"],
         compute_metrics=compute_metrics,
-        callbacks=[CustomTensorBoardCallback(), ResetLossesCallback()],
+        callbacks=[CustomTensorBoardCallback(), ResetLossesCallback(), EarlyStoppingCallback()],
     )
     trainer.train()
 

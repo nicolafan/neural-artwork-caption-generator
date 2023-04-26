@@ -71,7 +71,7 @@ class ViTForMultiClassification(nn.Module):
         else:
             self.log_vars = None
 
-    def toggle_freeze(self, freeze: bool):
+    def freeze_base_model(self, freeze: bool):
         """Toggle freeze/unfreeze of the ViT model.
 
         Args:
