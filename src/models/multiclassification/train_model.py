@@ -58,7 +58,7 @@ class CustomTensorBoardCallback(TensorBoardCallback):
         )
         for feature, log_var in log_vars.items():
             self.tb_writer.add_scalar(
-                f"train/{feature}_sigma", log_var, state.global_step
+                f"train/{feature}_log_var", log_var, state.global_step
             )
         self.tb_writer.flush()
 
@@ -111,7 +111,7 @@ def train():
         callbacks=[
             CustomTensorBoardCallback(),
             ResetLossesCallback(),
-            EarlyStoppingCallback(),
+            EarlyStoppingCallback(patience=1),
         ],
     )
     trainer.train()
