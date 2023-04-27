@@ -1,3 +1,4 @@
+import click
 import torch
 from transformers import (
     Trainer,
@@ -11,8 +12,6 @@ import src.models.multiclassification.data as data
 from src.models.multiclassification.metrics import compute_metrics
 from src.models.multiclassification.model import ViTForMultiClassification
 from src.utils.dirutils import get_models_dir
-
-MODEL_OUTPUT_DIR = get_models_dir() / "multiclassification" / "pretrain"
 
 
 class CustomTensorBoardCallback(TensorBoardCallback):
@@ -71,36 +70,74 @@ class ResetLossesCallback(TrainerCallback):
         model.losses_epoch_sum = [0] * 5
 
 
-def train():
+# add click options
+@click.command()
+@click.option(
+    "--model-output-dir",
+    type=click.Path(exists=False, file_okay=False),
+    help="Directory to save the model to.",
+)
+@click.option(
+    "--label",
+    type=click.Choice(data.MULTICLASS_FEATURES + data.MULTILABEL_FEATURES),
+    help="Label to train the model for.",
+    default=None,
+)
+@click.option(
+    "--freeze-base-model/--no-freeze-base-model",
+    default=True,
+    help="Whether to freeze the base model.",
+)
+@click.option(
+    "--batch-size",
+    type=int,
+    default=16,
+    help="Batch size to use for training.",
+)
+def train(model_output_dir, label, freeze_base_model, batch_size):
     """Train model."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     dataset = data.get_dataset_for_multiclassification()
 
+    multiclass_classifications, multilabel_classifications = data.get_multiclassification_dicts()
+    label_names = list(multiclass_classifications.keys()) + list(multilabel_classifications.keys())
+    if label is not None:
+        if label in multiclass_classifications:
+            multiclass_classifications = {label: multiclass_classifications[label]}
+            multilabel_classifications = {}
+        else:
+            multiclass_classifications = {}
+            multilabel_classifications = {label: multilabel_classifications[label]}
+        label_names = [label]
+
     training_args = TrainingArguments(
-        output_dir=MODEL_OUTPUT_DIR,
-        label_names=list(data.MULTICLASS_FEATURES + data.MULTILABEL_FEATURES),
+        output_dir=model_output_dir,
+        label_names=label_names,
         evaluation_strategy="epoch",
         logging_strategy="epoch",
         save_strategy="epoch",
         seed=42,
         load_best_model_at_end=True,
         metric_for_best_model="avg_macro_f1",
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=batch_size,
     )
 
     model = ViTForMultiClassification(
-        *data.get_multiclassification_dicts(),
+        multiclass_classifications, multilabel_classifications,
         data.compute_class_weight_tensors(dataset, device),
     )
     model.to(device)
-    model.freeze_base_model(True)
+    model.freeze_base_model(freeze_base_model)
 
-    dataset.set_format(
-        type="torch",
-        columns=["pixel_values", "artist", "style", "genre", "tags", "media"],
-    )
+    if label is None:
+        dataset.set_format(
+            type="torch",
+            columns=["pixel_values", "artist", "style", "genre", "tags", "media"],
+        )
+    else:
+        dataset.set_format(type="torch", columns=["pixel_values", label])
 
     trainer = Trainer(
         model=model,
@@ -111,7 +148,7 @@ def train():
         callbacks=[
             CustomTensorBoardCallback(),
             ResetLossesCallback(),
-            EarlyStoppingCallback(patience=1),
+            EarlyStoppingCallback(early_stopping_patience=1),
         ],
     )
     trainer.train()

@@ -107,9 +107,9 @@ class ViTForMultiClassification(nn.Module):
         for i, labels in enumerate([artist, style, genre]):
             if labels is None:
                 continue
-            feature = list(self.multiclass_classifications.keys())[i]
+            feature = list(self.multiclass_classifications.keys())[i] if len(self.multiclass_classifications) > 1 else list(self.multiclass_classifications.keys())[0]
             loss = F.cross_entropy(
-                logits[i],
+                logits[i] if len(logits) > 1 else logits[0],
                 labels.squeeze(),
                 weight=self.multiclass_class_weights[feature],
                 ignore_index=-1,
@@ -122,7 +122,8 @@ class ViTForMultiClassification(nn.Module):
             if labels is None:
                 continue
             loss = binary_cross_entropy_with_logits_ignore_no_labels(
-                logits[i + len(self.multiclass_classifications)], labels
+                logits[i + len(self.multiclass_classifications)] if len(logits) > 1 else logits[0],
+                labels
             )
             if torch.isnan(loss):
                 loss = 0

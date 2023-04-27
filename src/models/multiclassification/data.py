@@ -70,6 +70,9 @@ def compute_class_weight_tensors(dataset, device):
     """
     class_weights = {}
     for feature in MULTICLASS_FEATURES:
+        # check if feature is a column in dataset
+        if feature not in dataset["train"].column_names:
+            continue
         y_org = np.unique(dataset["train"][feature])
         # remove -1 from y_org
         y_org = y_org[y_org != -1]

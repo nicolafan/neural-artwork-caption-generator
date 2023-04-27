@@ -15,7 +15,7 @@ def main(images_dir, output_dir):
     """Creates CLIP embeddings for images in images_dir and saves them to
     output_dir.
 
-    The order of the embeddings corresponds to the order of the filenames
+    The order of the embeddings corresponds to the alphabetical order of the filenames
     returned by os.listdir(images_dir).
     The first embedding must be discarded as it is a dummy embedding.
 
