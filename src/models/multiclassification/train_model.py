@@ -1,17 +1,19 @@
 import click
 import torch
+from datasets import Dataset, load_from_disk
 from transformers import (
     Trainer,
     TrainerCallback,
     TrainingArguments,
     EarlyStoppingCallback,
+    ViTImageProcessor
 )
 from transformers.integrations import TensorBoardCallback
 
 import src.models.multiclassification.data as data
 from src.models.multiclassification.metrics import compute_metrics
 from src.models.multiclassification.model import ViTForMultiClassification
-from src.utils.dirutils import get_models_dir
+from src.utils.dirutils import get_models_dir, get_data_dir
 
 
 class CustomTensorBoardCallback(TensorBoardCallback):
@@ -104,7 +106,17 @@ def train(model_output_dir, label, freeze_base_model, epochs, batch_size):
     """Train model."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    dataset = data.get_dataset_for_multiclassification()
+    dataset: Dataset = load_from_disk(
+        get_data_dir() / "processed" / "multiclassification_dataset"
+    )
+    processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
+
+    def transform(examples):
+        examples["pixel_values"] = processor(
+            examples["image"], return_tensors="pt"
+        ).pixel_values
+        return examples
+    dataset.set_transform(transform)
 
     multiclass_classifications, multilabel_classifications = data.get_multiclassification_dicts()
     label_names = list(multiclass_classifications.keys()) + list(multilabel_classifications.keys())

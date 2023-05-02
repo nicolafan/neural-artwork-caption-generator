@@ -29,9 +29,6 @@ def get_dataset_for_multiclassification():
         return examples
 
     dataset = dataset.map(process, remove_columns="image", batched=True)
-
-    # shuffle the dataset with random_state=42
-    dataset = dataset.shuffle(seed=42)
     return dataset
 
 
