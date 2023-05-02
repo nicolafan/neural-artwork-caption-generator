@@ -55,8 +55,7 @@ def clean_dataset(df, min_label_count):
     valid_artists = set(
         artists_df[artists_df["image"] >= min_label_count]["artist"].values
     )
-    df.loc[~df["artist"].isin(valid_artists), "artist"] = pd.NA
-
+    df.loc[~df["artist"].isin(valid_artists), "artist"] = "other"
     # function to keep only valid labels
     def keep_valid_labels(x, valid_labels):
         if not pd.notnull(x):

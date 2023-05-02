@@ -89,12 +89,18 @@ class ResetLossesCallback(TrainerCallback):
     help="Whether to freeze the base model.",
 )
 @click.option(
+    "--epochs",
+    type=int,
+    default=10,
+    help="Number of epochs to train for.",
+)
+@click.option(
     "--batch-size",
     type=int,
     default=16,
     help="Batch size to use for training.",
 )
-def train(model_output_dir, label, freeze_base_model, batch_size):
+def train(model_output_dir, label, freeze_base_model, epochs, batch_size):
     """Train model."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -118,10 +124,12 @@ def train(model_output_dir, label, freeze_base_model, batch_size):
         logging_strategy="epoch",
         save_strategy="epoch",
         seed=42,
+        num_train_epochs=epochs,
         load_best_model_at_end=True,
         metric_for_best_model="avg_macro_f1",
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
+        gradient_accumulation_steps=32 // batch_size,
     )
 
     model = ViTForMultiClassification(
@@ -151,7 +159,7 @@ def train(model_output_dir, label, freeze_base_model, batch_size):
             EarlyStoppingCallback(early_stopping_patience=1),
         ],
     )
-    trainer.train()
+    trainer.train(resume_from_checkpoint=False)
 
 
 if __name__ == "__main__":
