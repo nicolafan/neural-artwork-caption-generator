@@ -111,13 +111,6 @@ def train(model_output_dir, label, freeze_base_model, epochs, batch_size):
     )
     processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
 
-    def transform(examples):
-        examples["pixel_values"] = processor(
-            examples["image"], return_tensors="pt"
-        ).pixel_values
-        return examples
-    dataset.set_transform(transform)
-
     multiclass_classifications, multilabel_classifications = data.get_multiclassification_dicts()
     label_names = list(multiclass_classifications.keys()) + list(multilabel_classifications.keys())
     if label is not None:
@@ -142,6 +135,7 @@ def train(model_output_dir, label, freeze_base_model, epochs, batch_size):
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         gradient_accumulation_steps=32 // batch_size,
+        remove_unused_columns=False,
     )
 
     model = ViTForMultiClassification(
@@ -151,13 +145,14 @@ def train(model_output_dir, label, freeze_base_model, epochs, batch_size):
     model.to(device)
     model.freeze_base_model(freeze_base_model)
 
-    if label is None:
-        dataset.set_format(
-            type="torch",
-            columns=["pixel_values", "artist", "style", "genre", "tags", "media"],
-        )
-    else:
-        dataset.set_format(type="torch", columns=["pixel_values", label])
+    dataset = dataset.with_format(type="torch", columns=["image"] + label_names)
+
+    def transform(examples):
+        examples["pixel_values"] = processor(
+            examples["image"], return_tensors="pt"
+        ).pixel_values
+        return {k: v for k, v in examples.items() if k != "image"}
+    dataset.set_transform(transform)
 
     trainer = Trainer(
         model=model,
