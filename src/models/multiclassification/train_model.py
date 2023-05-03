@@ -102,7 +102,13 @@ class ResetLossesCallback(TrainerCallback):
     default=16,
     help="Batch size to use for training.",
 )
-def train(model_output_dir, label, freeze_base_model, epochs, batch_size):
+@click.option(
+    "--learning-rate",
+    type=float,
+    default=5e-5,
+    help="Learning rate to use for training.",
+)
+def train(model_output_dir, label, freeze_base_model, epochs, batch_size, learning_rate):
     """Train model."""
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -136,6 +142,7 @@ def train(model_output_dir, label, freeze_base_model, epochs, batch_size):
         per_device_eval_batch_size=batch_size,
         gradient_accumulation_steps=32 // batch_size,
         remove_unused_columns=False,
+        learning_rate=learning_rate,
     )
 
     model = ViTForMultiClassification(

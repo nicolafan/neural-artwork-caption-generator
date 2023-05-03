@@ -1,9 +1,11 @@
 import os
-from pathlib import Path
-from datasets import load_dataset
-import numpy as np
-from sklearn.preprocessing import OrdinalEncoder, MultiLabelBinarizer
 from functools import partial
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from datasets import load_dataset
+from sklearn.preprocessing import MultiLabelBinarizer, OrdinalEncoder
 
 
 def _encode_multiclass_feature(examples, feature, encoder):
@@ -117,4 +119,26 @@ def get_prepared_dataset_for_multiclassification(data_dir):
         )
 
     dataset = dataset.remove_columns(["caption", "human"])
+
+    for split in dataset.keys():
+        # read data_dir/metadata.csv
+        metadata = pd.read_csv(Path(data_dir) / (split if split != "validation" else "val") / "metadata.csv")
+        # get list of locations of file_name in dataset in the metadata column
+        metadata_order = {}
+        for idx, row in metadata.iterrows():
+            metadata_order[row["file_name"]] = idx
+        try:
+            order = [metadata_order[os.path.basename(x["image"].filename)] for x in dataset[split]]
+        except KeyError:
+            print(len(metadata_order))
+            print(len(dataset[split]))
+            print(split)
+            for image in dataset[split]:
+                if not os.path.basename(image["image"].filename) in metadata_order:
+                    print(os.path.basename(image["image"].filename))
+
+        # sort dataset[split] by filename according to the file_name column in metadata
+        dataset[split] = dataset[split].add_column("order", order)
+        dataset[split] = dataset[split].sort("order")
+        dataset[split] = dataset[split].remove_columns(["order"])
     return dataset, ordinal_encoders, multilabel_binarizers

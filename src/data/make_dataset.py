@@ -108,6 +108,13 @@ def make_imagefolder_dataset(df, input_dir, output_dir, logger):
                 f"can't create the {split} split directory, delete it if it already exists"
             )
 
+        def adjust_filename(s):
+            return (s.replace("train", "t-rain")
+                     .replace("test", "t-est")
+                     .replace("validation", "v-alidation")
+                     .replace("val", "v-al")
+                     .replace("valid", "v-alid"))
+
         # copy images
         logger.info(f"copying images for {split} split")
         for filename in tqdm(filenames):
@@ -115,12 +122,14 @@ def make_imagefolder_dataset(df, input_dir, output_dir, logger):
             # convert to RGB if needed
             if image.mode == "RGBA" or image.mode == "P":
                 image = image.convert("RGB")
+            filename = adjust_filename(filename)
             image.save(split_dir / filename)
         logger.info("images copied")
 
         # create metadata
         split_df = df[df["image"].isin(filenames)]
         split_df = split_df.rename(columns={"image": "file_name"})
+        split_df["file_name"] = split_df["file_name"].apply(adjust_filename)
 
         # sort the split_df by keeping the order in the split file
         split_df = split_df.sort_values(by='file_name', key=lambda x: x.map({v: i for i, v in enumerate(filenames)}))
