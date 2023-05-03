@@ -165,7 +165,7 @@ class ViTForMultiClassification(nn.Module):
 
         # Compute weighted losses
         weighted_losses = [
-            loss / (torch.exp(-self.log_vars[i])) for i, loss in enumerate(losses)
+            loss * (torch.exp(-self.log_vars[i])) for i, loss in enumerate(losses)
         ]
 
         # Compute regularizer as sum of log of loss weights plus eps
