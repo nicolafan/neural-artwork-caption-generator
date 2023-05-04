@@ -137,8 +137,8 @@ def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, lear
     class_weight_tensors = data.compute_class_weight_tensors(dataset, DEVICE)
 
     dataset = dataset.with_transform(partial(data.transform_for_model, processor=processor, device=DEVICE))
-    train_loader = torch.utils.data.DataLoader(dataset["train"].select(range(1000)), batch_size=batch_size)
-    validation_loader = torch.utils.data.DataLoader(dataset["validation"].select(range(1000)), batch_size=batch_size)
+    train_loader = torch.utils.data.DataLoader(dataset["train"], batch_size=batch_size)
+    validation_loader = torch.utils.data.DataLoader(dataset["validation"], batch_size=batch_size)
 
     if feature is not None:
         remove_useless_features(feature)
