@@ -4,25 +4,12 @@ import torch.nn.functional as F
 from transformers import ViTModel
 
 
-# custom loss for multilabel classification, ignore elements that have 0 labels
-def binary_cross_entropy_with_logits_ignore_no_labels(preds, targets):
-    zero_labels = torch.sum(targets, dim=-1) == 0
-    targets = targets.float()
-
-    # Apply BCEWithLogitsLoss only to non-zero labels
-    loss = F.binary_cross_entropy_with_logits(preds, targets, reduction="none")
-    loss = torch.where(zero_labels.unsqueeze(-1), torch.zeros_like(loss), loss)
-    loss = torch.mean(loss)
-
-    return loss
-
-
 class ViTForMultiClassification(nn.Module):
     def __init__(
         self,
         multiclass_classifications: dict[str, int],
         multilabel_classifications: dict[str, int],
-        multiclass_class_weights: dict[str, torch.Tensor],
+        multiclass_class_weights: dict[str, torch.Tensor]=None,
     ):
         """Initialize a ViTForMultiClassification model for multi-classification and multi-label classification.
 
@@ -59,9 +46,7 @@ class ViTForMultiClassification(nn.Module):
                 ]
             )
 
-        # initialize losses as a list with 5 0s
-        self.losses_epoch_sum = [0] * self.n_classifications
-        # loss weights
+        # loss weights (if multitask learning)
         if self.n_classifications > 1:
             self.log_vars = nn.Parameter(
                 torch.zeros(
@@ -80,114 +65,13 @@ class ViTForMultiClassification(nn.Module):
         for param in self.vit.parameters():
             param.requires_grad = not freeze
 
-    def compute_losses(
-        self,
-        logits: tuple[torch.Tensor],
-        artist: torch.Tensor,
-        style: torch.Tensor,
-        genre: torch.Tensor,
-        tags: torch.Tensor,
-        media: torch.Tensor,
-    ):
-        """Compute loss for multi-classification and multi-label classification.
-
-        Args:
-            logits (tuple[torch.Tensor]): output of the classification heads
-            artist (torch.Tensor): artist labels
-            style (torch.Tensor): style labels
-            genre (torch.Tensor): genre labels
-            tags (torch.Tensor): tags labels
-            media (torch.Tensor): media labels
-
-        Returns:
-            torch.Tensor: loss
-        """
-        losses = []
-
-        for i, labels in enumerate([artist, style, genre]):
-            if labels is None:
-                continue
-            feature = list(self.multiclass_classifications.keys())[i] if len(self.multiclass_classifications) > 1 else list(self.multiclass_classifications.keys())[0]
-            loss = F.cross_entropy(
-                logits[i] if len(logits) > 1 else logits[0],
-                labels.squeeze(),
-                weight=self.multiclass_class_weights[feature],
-                ignore_index=-1,
-            )
-            if torch.isnan(loss):
-                loss = 0
-            losses.append(loss)
-
-        for i, labels in enumerate([tags, media]):
-            if labels is None:
-                continue
-            loss = binary_cross_entropy_with_logits_ignore_no_labels(
-                logits[i + len(self.multiclass_classifications)] if len(logits) > 1 else logits[0],
-                labels
-            )
-            if torch.isnan(loss):
-                loss = 0
-            losses.append(loss)
-
-        # sum the list of losses to self.losses
-        for i, loss in enumerate(losses):
-            self.losses_epoch_sum[i] += loss if isinstance(loss, int) else loss.item()
-
-        return losses
-
-    def compute_loss(
-        self,
-        logits: tuple[torch.Tensor],
-        artist: torch.Tensor,
-        style: torch.Tensor,
-        genre: torch.Tensor,
-        tags: torch.Tensor,
-        media: torch.Tensor,
-    ):
-        """Compute weighted loss.
-
-        Args:
-            logits (tuple[torch.Tensor]): tuple of logits
-            artist (torch.Tensor): artist tensor
-            style (torch.Tensor): style tensor
-            genre (torch.Tensor): genre tensor
-            tags (torch.Tensor): tags tensor
-            media (torch.Tensor): media tensor
-
-        Returns:
-            torch.Tensor: weighted loss
-        """
-        losses = self.compute_losses(logits, artist, style, genre, tags, media)
-
-        # return the first loss if there is only one loss
-        if len(losses) == 1:
-            return losses[0]
-
-        # Compute weighted losses
-        weighted_losses = [
-            loss * (torch.exp(-self.log_vars[i])) for i, loss in enumerate(losses)
-        ]
-
-        # Compute regularizer as sum of log of loss weights plus eps
-        regularizer = torch.sum(self.log_vars / 2)
-
-        # Sum the list of weighted losses
-        loss = torch.sum(torch.stack(weighted_losses)) + regularizer
-
-        return loss
-
     def forward(
-        self, pixel_values, artist=None, style=None, genre=None, tags=None, media=None
+        self, pixel_values
     ):
         """Forward pass for ViTForMultiClassification model.
 
         Args:
             pixel_values (torch.Tensor): pixel values of the images
-            artist (torch.Tensor, optional): artist labels. Defaults to None.
-            style (torch.Tensor, optional): style labels. Defaults to None.
-            genre (torch.Tensor, optional): genre labels. Defaults to None.
-            tags (torch.Tensor, optional): tags labels. Defaults to None.
-            media (torch.Tensor, optional): media labels. Defaults to None.
         """
         x = self.vit(pixel_values=pixel_values).pooler_output
         logits = None
@@ -202,15 +86,11 @@ class ViTForMultiClassification(nn.Module):
             else:
                 logits = multilabel_logits
 
-        # compute loss only if there is at least one not None label
-        if (
-            artist is not None
-            or style is not None
-            or genre is not None
-            or tags is not None
-            or media is not None
-        ):
-            loss = self.compute_loss(logits, artist, style, genre, tags, media)
-            return (loss,) + logits
-        else:
-            return logits
+        logits_dict = {
+            feature: logits[i]
+            for i, feature in enumerate(
+                list(self.multiclass_classifications.keys())
+                + list(self.multilabel_classifications.keys())
+            )
+        }
+        return logits_dict

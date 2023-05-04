@@ -1,89 +1,100 @@
+import logging
+import math
+import os
+import sys
+from datetime import datetime
+from functools import partial
+from pathlib import Path
+import random
+
 import click
+import numpy as np
 import torch
+import torch.nn.functional as F
 from datasets import Dataset, load_from_disk
-from transformers import (
-    Trainer,
-    TrainerCallback,
-    TrainingArguments,
-    EarlyStoppingCallback,
-    ViTImageProcessor
-)
-from transformers.integrations import TensorBoardCallback
+from dotenv import find_dotenv, load_dotenv
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
+from transformers import ViTImageProcessor
 
-import src.models.multiclassification.data as data
-from src.models.multiclassification.metrics import compute_metrics
+from src.models.multiclassification import data
+from src.models.multiclassification.losses import losses_fn, join_losses
+from src.models.multiclassification.evaluate_model import evaluate
 from src.models.multiclassification.model import ViTForMultiClassification
-from src.utils.dirutils import get_models_dir, get_data_dir
+from src.utils.dirutils import get_data_dir
+from src.utils.logutils import init_log
+
+# set dictionaries with features and number of classes
+MULTICLASS_CLASSIFICATIONS, MULTILABEL_CLASSIFICATIONS = data.get_multiclassification_dicts()
+MULTICLASS_FEATURES, MULTILABEL_FEATURES = list(MULTICLASS_CLASSIFICATIONS.keys()), list(MULTILABEL_CLASSIFICATIONS.keys())
+ALL_FEATURES = MULTICLASS_FEATURES + MULTILABEL_FEATURES
+# set device
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-class CustomTensorBoardCallback(TensorBoardCallback):
-    """Custom TensorBoard callback."""
-
-    def __init__(self, *args, **kwargs):
-        """Initialize CustomTensorBoardCallback."""
-        super().__init__(*args, **kwargs)
-        self.last_step = -1
-
-    def on_log(self, args, state, control, logs=None, **kwargs):
-        """Log metrics to TensorBoard."""
-        super().on_log(args, state, control, logs, **kwargs)
-        if self.last_step == state.global_step:  # skip if already logged
-            return
-        self.last_step = state.global_step
-        model = kwargs["model"]
-        # TODO: divide by the no. of steps in the epoch
-        multiclass_losses = dict(
-            (feature, model.losses_epoch_sum[i] / (state.global_step / state.epoch))
-            for i, feature in enumerate(model.multiclass_classifications.keys())
-        )
-        multilabel_losses = dict(
-            (
-                feature,
-                model.losses_epoch_sum[i + len(model.multiclass_classifications.keys())]
-                / (state.global_step / state.epoch)
-            )
-            for i, feature in enumerate(model.multilabel_classifications.keys())
-        )
-
-        for feature, loss in multiclass_losses.items():
-            self.tb_writer.add_scalar(f"train/{feature}_loss", loss, state.global_step)
-        for feature, loss in multilabel_losses.items():
-            self.tb_writer.add_scalar(f"train/{feature}_loss", loss, state.global_step)
-
-        log_vars = dict(
-            (feature, model.log_vars[i])
-            for i, feature in enumerate(
-                list(model.multiclass_classifications.keys())
-                + list(model.multilabel_classifications.keys())
-            )
-        )
-        for feature, log_var in log_vars.items():
-            self.tb_writer.add_scalar(
-                f"train/{feature}_log_var", log_var, state.global_step
-            )
-        self.tb_writer.flush()
+def remove_useless_features(feature):
+    global MULTICLASS_CLASSIFICATIONS, MULTILABEL_CLASSIFICATIONS
+    if feature in MULTICLASS_CLASSIFICATIONS:
+        MULTICLASS_CLASSIFICATIONS = {feature: MULTICLASS_CLASSIFICATIONS[feature]}
+        MULTILABEL_CLASSIFICATIONS = {}
+    elif feature in MULTILABEL_CLASSIFICATIONS:
+        MULTILABEL_CLASSIFICATIONS = {feature: MULTILABEL_CLASSIFICATIONS[feature]}
+        MULTICLASS_CLASSIFICATIONS = {}
+    
+    global MULTICLASS_FEATURES, MULTILABEL_FEATURES, ALL_FEATURES
+    MULTICLASS_FEATURES, MULTILABEL_FEATURES = list(MULTICLASS_CLASSIFICATIONS.keys()), list(MULTILABEL_CLASSIFICATIONS.keys())
+    ALL_FEATURES = MULTICLASS_FEATURES + MULTILABEL_FEATURES
 
 
-class ResetLossesCallback(TrainerCallback):
-    """Reset losses callback."""
-
-    def on_epoch_start(self, args, state, control, **kwargs):
-        model = kwargs["model"]
-        model.losses_epoch_sum = [0] * 5
+def find_last_checkpoint(dir):
+    # find last .pt file split on - and take the last part
+    return sorted(dir.glob("*.pt"), key=lambda x: int(x.stem.split("-")[-1].replace(".pt", "")))[-1]
 
 
-# add click options
+def train_one_epoch(model, optimizer, dataloader, batch_size, num_accumulation_steps):
+    epoch_loss = 0.
+    epoch_label_losses = [0.] * len(ALL_FEATURES)
+    n_batches = math.ceil(len(dataloader) * batch_size / 32) # virtual number of batches
+
+    optimizer.zero_grad()
+    for i, batch in enumerate(tqdm(dataloader)):
+        # get inputs and targets from batch
+        inputs, targets = batch["pixel_values"], {k: batch[k] for k in batch if k != "pixel_values"}
+
+        # predict
+        outputs = model(inputs)
+
+        # Compute the loss and its gradients
+        losses = losses_fn(MULTICLASS_FEATURES, MULTILABEL_FEATURES, outputs, targets)
+        loss = join_losses(model, losses)
+        loss = loss / num_accumulation_steps
+        loss.backward()
+        
+        # Update our running losses and loss tally
+        for j, _ in enumerate(ALL_FEATURES):
+            epoch_label_losses[j] += losses[j].item() / num_accumulation_steps
+        epoch_loss += loss.item()
+
+        if (i+1) % num_accumulation_steps == 0 or (i+1) == len(dataloader):
+            # Update weights
+            optimizer.step()
+            optimizer.zero_grad()
+
+    # return the average loss and the average loss per label
+    return epoch_loss / n_batches, [loss / n_batches for loss in epoch_label_losses]
+
+
 @click.command()
 @click.option(
     "--model-output-dir",
     type=click.Path(exists=False, file_okay=False),
-    help="Directory to save the model to.",
+    help="Directory where the model will be saved.",
 )
 @click.option(
-    "--label",
+    "--feature",
     type=click.Choice(data.MULTICLASS_FEATURES + data.MULTILABEL_FEATURES),
-    help="Label to train the model for.",
     default=None,
+    help="Feature to train the model for, if None use multitask learning.",
 )
 @click.option(
     "--freeze-base-model/--no-freeze-base-model",
@@ -108,73 +119,112 @@ class ResetLossesCallback(TrainerCallback):
     default=5e-5,
     help="Learning rate to use for training.",
 )
-def train(model_output_dir, label, freeze_base_model, epochs, batch_size, learning_rate):
-    """Train model."""
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    dataset: Dataset = load_from_disk(
-        get_data_dir() / "processed" / "multiclassification_dataset"
-    )
+@click.option(
+    "--resume-from-checkpoint/--no-resume-from-checkpoint",
+    default=False,
+    help="Whether to resume from checkpoint.",
+)
+def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, learning_rate, resume_from_checkpoint):
+    logger = logging.getLogger(__name__)
+    random.seed(42)
+    np.random.seed(42)
+    torch.manual_seed(42)
+    model_output_dir = Path(model_output_dir)
+    
+    # load and process dataset
     processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
+    dataset: Dataset = load_from_disk(get_data_dir() / "processed" / "multiclassification_dataset")
+    class_weight_tensors = data.compute_class_weight_tensors(dataset, DEVICE)
 
-    multiclass_classifications, multilabel_classifications = data.get_multiclassification_dicts()
-    label_names = list(multiclass_classifications.keys()) + list(multilabel_classifications.keys())
-    if label is not None:
-        if label in multiclass_classifications:
-            multiclass_classifications = {label: multiclass_classifications[label]}
-            multilabel_classifications = {}
-        else:
-            multiclass_classifications = {}
-            multilabel_classifications = {label: multilabel_classifications[label]}
-        label_names = [label]
+    dataset = dataset.with_transform(partial(data.transform_for_model, processor=processor, device=DEVICE))
+    train_loader = torch.utils.data.DataLoader(dataset["train"].select(range(1000)), batch_size=batch_size)
+    validation_loader = torch.utils.data.DataLoader(dataset["validation"].select(range(1000)), batch_size=batch_size)
 
-    training_args = TrainingArguments(
-        output_dir=model_output_dir,
-        label_names=label_names,
-        evaluation_strategy="epoch",
-        logging_strategy="epoch",
-        save_strategy="epoch",
-        seed=42,
-        num_train_epochs=epochs,
-        load_best_model_at_end=True,
-        metric_for_best_model="avg_macro_f1",
-        per_device_train_batch_size=batch_size,
-        per_device_eval_batch_size=batch_size,
-        gradient_accumulation_steps=32 // batch_size,
-        remove_unused_columns=False,
-        learning_rate=learning_rate,
-    )
+    if feature is not None:
+        remove_useless_features(feature)
 
-    model = ViTForMultiClassification(
-        multiclass_classifications, multilabel_classifications,
-        data.compute_class_weight_tensors(dataset, device),
-    )
-    model.to(device)
+    # load model
+    model = ViTForMultiClassification(MULTICLASS_CLASSIFICATIONS, MULTILABEL_CLASSIFICATIONS, class_weight_tensors)
+    model = model.to(DEVICE)
     model.freeze_base_model(freeze_base_model)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    epoch = 1
+    num_accumulation_steps = 32 // batch_size
 
-    dataset = dataset.with_format(type="torch", columns=["image"] + label_names)
+    # load checkpoint if needed
+    if resume_from_checkpoint:
+        last_checkpoint = find_last_checkpoint(model_output_dir)
 
-    def transform(examples):
-        examples["pixel_values"] = processor(
-            examples["image"], return_tensors="pt"
-        ).pixel_values
-        return {k: v for k, v in examples.items() if k != "image"}
-    dataset.set_transform(transform)
+        logger.info(f"loading checkpoint from {last_checkpoint}")
+        checkpoint = torch.load(last_checkpoint)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        logger.info(f"optimizer: {checkpoint['optimizer_state_dict']['param_groups'][0]['lr']}")
+        # Compare the loaded parameters to the saved parameters
+        for name, param in model.named_parameters():
+            if name in checkpoint["model_state_dict"]:
+                if not torch.all(torch.eq(param, checkpoint["model_state_dict"][name])):
+                    print(f"Parameter {name} is not equal to saved checkpoint")
+            else:
+                print(f"Parameter {name} not found in saved checkpoint")
+        epoch = checkpoint["epoch"]
+        epoch += 1
 
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=dataset["train"],
-        eval_dataset=dataset["validation"],
-        compute_metrics=compute_metrics,
-        callbacks=[
-            CustomTensorBoardCallback(),
-            ResetLossesCallback(),
-            EarlyStoppingCallback(early_stopping_patience=1),
-        ],
-    )
-    trainer.train(resume_from_checkpoint=False)
+    logger.info(f"optimizer: {optimizer.param_groups[0]['lr']}")
+    # Initializing
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    writer = SummaryWriter(model_output_dir / f"runs/{timestamp}")
+
+    while epoch <= epochs:
+        logger.info(f"EPOCH {epoch}:")
+
+        # Make sure gradient tracking is on, and do a pass over the data
+        model.train(True)
+        train_loss, train_label_losses = train_one_epoch(model, optimizer, train_loader, batch_size, num_accumulation_steps)
+        torch.cuda.empty_cache()
+
+        # Log train losses
+        for i, label in enumerate(ALL_FEATURES):
+            writer.add_scalar(f"train/{label}_loss", train_label_losses[i], epoch)
+        writer.add_scalar("train/loss", train_loss, epoch)
+        writer.add_scalar("train/lr", optimizer.param_groups[0]["lr"], epoch)
+        if model.log_vars is not None:
+            for i, label in enumerate(ALL_FEATURES):
+                writer.add_scalar(f"train/{label}_log_var", model.log_vars[i].item(), epoch)
+
+        # We don't need gradients on to do reporting
+        model.train(False)
+        avg_vloss, running_label_vlosses, metrics = evaluate(model, validation_loader, MULTICLASS_FEATURES, MULTILABEL_FEATURES) 
+        logger.info('LOSS train {} valid {}'.format(train_loss, avg_vloss))
+
+        # Log valid losses
+        for i, label in enumerate(ALL_FEATURES):
+            writer.add_scalar(f"valid/{label}_loss", running_label_vlosses[i] / len(validation_loader), epoch)
+        writer.add_scalar("valid/loss", avg_vloss, epoch)
+
+        # Log the running loss averaged per batch
+        # for both training and validation
+        writer.add_scalars('train_vs_valid_loss',
+                        {'train': train_loss, 'valid': avg_vloss},
+                        epoch)
+        
+        # Log metrics
+        for k, v in metrics.items():
+            writer.add_scalar(f'valid/{k}', v, epoch)
+        writer.flush()
+
+        # Save the model at each epoch
+        model_path = model_output_dir / f"model-{timestamp}-{epoch}.pt"
+        torch.save({
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(), 
+            "epoch": epoch}, model_path)
+
+        epoch += 1
 
 
 if __name__ == "__main__":
+    init_log()
+    load_dotenv(find_dotenv())
+
     train()

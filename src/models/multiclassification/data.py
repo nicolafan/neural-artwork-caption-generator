@@ -11,27 +11,6 @@ MULTICLASS_FEATURES = ("artist", "style", "genre")
 MULTILABEL_FEATURES = ("tags", "media")
 
 
-def get_dataset_for_multiclassification():
-    """Get dataset for multiclassification.
-
-    Returns:
-        dataset (datasets.Dataset): dataset for multiclassification
-    """
-    dataset: Dataset = load_from_disk(
-        get_data_dir() / "processed" / "multiclassification_dataset"
-    )
-    processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
-
-    def process(examples):
-        examples["pixel_values"] = processor(
-            examples["image"], return_tensors="pt"
-        ).pixel_values
-        return examples
-
-    dataset = dataset.map(process, remove_columns="image", batched=True)
-    return dataset
-
-
 def get_multiclassification_dicts():
     """Get multiclassification dicts.
 
@@ -81,3 +60,23 @@ def compute_class_weight_tensors(dataset, device):
             .to(device)
         )
     return class_weights
+
+
+def transform_for_model(examples, processor, device):
+    """Transform examples for model.
+
+    Args:
+        examples (dict): dict with examples
+        processor (transformers.ViTImageProcessor): image processor
+        device (torch.device): device to put the tensors on
+    Returns:
+        new_examples (dict): dict with transformed examples
+    """
+    examples["pixel_values"] = processor(examples["image"], return_tensors="pt").pixel_values
+    new_examples = {}
+    for feature in MULTICLASS_FEATURES:
+        new_examples[feature] = torch.tensor(examples[feature], dtype=torch.long, device=device)
+    for feature in MULTILABEL_FEATURES:
+        new_examples[feature] = torch.tensor(examples[feature], dtype=torch.float, device=device)
+    new_examples["pixel_values"] = examples["pixel_values"].to(device)
+    return new_examples
