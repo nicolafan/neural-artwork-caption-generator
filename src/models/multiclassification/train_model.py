@@ -102,6 +102,11 @@ def train_one_epoch(model, optimizer, dataloader, class_weight_tensors, batch_si
     help="Whether to freeze the base model.",
 )
 @click.option(
+    "--freeze-log-vars/--no-freeze-log-vars",
+    default=True,
+    help="Whether to freeze the log variances to weight the losses.",
+)
+@click.option(
     "--epochs",
     type=int,
     default=10,
@@ -124,7 +129,13 @@ def train_one_epoch(model, optimizer, dataloader, class_weight_tensors, batch_si
     default=False,
     help="Whether to resume from checkpoint.",
 )
-def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, learning_rate, resume_from_checkpoint):
+@click.option(
+    "--reload-optimizer/--no-reload-optimizer",
+    default=True,
+    help="Whether to reload the optimizer.",
+)
+def train(model_output_dir, feature, freeze_base_model, freeze_log_vars, epochs, batch_size, learning_rate, resume_from_checkpoint, reload_optimizer):
+    # TODO: optimizer can also not be reloaded
     logger = logging.getLogger(__name__)
     random.seed(42)
     np.random.seed(42)
@@ -132,7 +143,7 @@ def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, lear
     model_output_dir = Path(model_output_dir)
     
     # load and process dataset
-    processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224")
+    processor = ViTImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k")
     dataset: Dataset = load_from_disk(get_data_dir() / "processed" / "multiclassification_dataset")
     class_weight_tensors = data.compute_class_weight_tensors(dataset, DEVICE)
 
@@ -144,9 +155,10 @@ def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, lear
         remove_useless_features(feature)
 
     # load model
-    model = ViTForMultiClassification(MULTICLASS_CLASSIFICATIONS, MULTILABEL_CLASSIFICATIONS, class_weight_tensors)
+    model = ViTForMultiClassification(MULTICLASS_CLASSIFICATIONS, MULTILABEL_CLASSIFICATIONS)
     model = model.to(DEVICE)
     model.freeze_base_model(freeze_base_model)
+    model.freeze_log_vars(freeze_log_vars)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
     epoch = 1
     num_accumulation_steps = 32 // batch_size
@@ -158,19 +170,11 @@ def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, lear
         logger.info(f"loading checkpoint from {last_checkpoint}")
         checkpoint = torch.load(last_checkpoint)
         model.load_state_dict(checkpoint["model_state_dict"])
-        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        logger.info(f"optimizer: {checkpoint['optimizer_state_dict']['param_groups'][0]['lr']}")
-        # Compare the loaded parameters to the saved parameters
-        for name, param in model.named_parameters():
-            if name in checkpoint["model_state_dict"]:
-                if not torch.all(torch.eq(param, checkpoint["model_state_dict"][name])):
-                    print(f"Parameter {name} is not equal to saved checkpoint")
-            else:
-                print(f"Parameter {name} not found in saved checkpoint")
+        if reload_optimizer:
+            optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         epoch = checkpoint["epoch"]
         epoch += 1
 
-    logger.info(f"optimizer: {optimizer.param_groups[0]['lr']}")
     # Initializing
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     writer = SummaryWriter(model_output_dir / f"runs/{timestamp}")

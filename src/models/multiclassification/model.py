@@ -25,7 +25,7 @@ class ViTForMultiClassification(nn.Module):
         )
 
         # initialize ViT model
-        self.vit = ViTModel.from_pretrained("google/vit-base-patch16-224")
+        self.vit = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k", add_pooling_layer=False)
 
         # initialize classification heads
         if self.multiclass_classifications:
@@ -63,6 +63,16 @@ class ViTForMultiClassification(nn.Module):
         for param in self.vit.parameters():
             param.requires_grad = not freeze
 
+    def freeze_log_vars(self, freeze: bool):
+        """Toggle freeze/unfreeze of the log vars.
+
+        Args:
+            freeze (bool): freeze or unfreeze
+        """
+        if self.log_vars is not None:
+            for param in self.log_vars:
+                param.requires_grad = not freeze
+
     def forward(
         self, pixel_values
     ):
@@ -71,7 +81,7 @@ class ViTForMultiClassification(nn.Module):
         Args:
             pixel_values (torch.Tensor): pixel values of the images
         """
-        x = self.vit(pixel_values=pixel_values).pooler_output
+        x = self.vit(pixel_values=pixel_values).last_hidden_state[:, 0]
         logits = None
 
         if self.multiclass_classifications:
