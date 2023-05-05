@@ -199,7 +199,7 @@ def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, lear
 
         # Log valid losses
         for i, label in enumerate(ALL_FEATURES):
-            writer.add_scalar(f"valid/{label}_loss", running_label_vlosses[i] / len(validation_loader), epoch)
+            writer.add_scalar(f"valid/{label}_loss", running_label_vlosses[i], epoch)
         writer.add_scalar("valid/loss", avg_vloss, epoch)
 
         # Log the running loss averaged per batch

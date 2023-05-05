@@ -11,6 +11,14 @@ from src.models.multiclassification.losses import join_losses, losses_fn
 
 
 def _concatenate_batch_arrays(all_data):
+    """Concatenates arrays in a batch.
+
+    Args:
+        all_data (list[dict]): list of dictionaries containing arrays
+
+    Returns:
+        dict: dictionary of concatenated arrays
+    """
     all_data_concat = {}
     for d in all_data:
         for key in d:
@@ -25,7 +33,10 @@ def compute_metrics(outputs, targets, multiclass_features, multilabel_features):
     """Computes metrics for multi-classification and multi-label classification.
 
     Args:
-        eval_pred (transformers.EvalPrediction):
+        outputs (dict): dictionary of outputs
+        targets (dict): dictionary of targets
+        multiclass_features (list[str]): list of multiclass features
+        multilabel_features (list[str]): list of multilabel features
 
     Returns:
         dict: dictionary of metrics
@@ -92,6 +103,20 @@ def compute_metrics(outputs, targets, multiclass_features, multilabel_features):
 
 @torch.no_grad()
 def evaluate(model, dataloader, class_weight_tensors, multiclass_features, multilabel_features, batch_size, num_accumulation_steps):
+    """Evaluates a model.
+
+    Args:
+        model (ViTForMultiClassification): model to evaluate
+        dataloader (DataLoader): dataloader to use
+        class_weight_tensors (dict): dictionary of class weight tensors
+        multiclass_features (list[str]): list of multiclass features
+        multilabel_features (list[str]): list of multilabel features
+        batch_size (int): batch size
+        num_accumulation_steps (int): number of accumulation steps
+
+    Returns:
+        tuple: tuple of (average loss, average label losses, dictionary of metrics)
+    """
     all_features = multiclass_features + multilabel_features
 
     # Validate

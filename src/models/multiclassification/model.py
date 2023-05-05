@@ -8,8 +8,7 @@ class ViTForMultiClassification(nn.Module):
     def __init__(
         self,
         multiclass_classifications: dict[str, int],
-        multilabel_classifications: dict[str, int],
-        multiclass_class_weights: dict[str, torch.Tensor]=None,
+        multilabel_classifications: dict[str, int]
     ):
         """Initialize a ViTForMultiClassification model for multi-classification and multi-label classification.
 
@@ -24,7 +23,6 @@ class ViTForMultiClassification(nn.Module):
         self.n_classifications = len(multiclass_classifications) + len(
             multilabel_classifications
         )
-        self.multiclass_class_weights = multiclass_class_weights
 
         # initialize ViT model
         self.vit = ViTModel.from_pretrained("google/vit-base-patch16-224")
