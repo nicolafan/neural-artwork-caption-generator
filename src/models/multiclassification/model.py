@@ -69,9 +69,9 @@ class ViTForMultiClassification(nn.Module):
         Args:
             freeze (bool): freeze or unfreeze
         """
-        if self.log_vars is not None:
-            for param in self.log_vars:
-                param.requires_grad = not freeze
+        if freeze and self.log_vars is not None:
+            frozen_log_vars = nn.Parameter(self.log_vars.clone().detach(), requires_grad=False)
+            self.log_vars = frozen_log_vars
 
     def forward(
         self, pixel_values
