@@ -23,10 +23,10 @@ def binary_cross_entropy_with_logits_ignore_no_labels(preds: torch.Tensor, targe
     return loss
 
 
-def losses_fn(multiclass_features, multilabel_features, outputs, targets):
+def losses_fn(multiclass_features, multilabel_features, outputs, targets, class_weight_tensors):
     losses = []
     for feature in multiclass_features:
-        loss = F.cross_entropy(outputs[feature], targets[feature].squeeze(), ignore_index=-1)
+        loss = F.cross_entropy(outputs[feature], targets[feature].squeeze(), ignore_index=-1, weight=class_weight_tensors[feature])
         losses.append(loss)
     for feature in multilabel_features:
         loss = binary_cross_entropy_with_logits_ignore_no_labels(outputs[feature], targets[feature])

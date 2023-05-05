@@ -51,7 +51,7 @@ def find_last_checkpoint(dir):
     return sorted(dir.glob("*.pt"), key=lambda x: int(x.stem.split("-")[-1].replace(".pt", "")))[-1]
 
 
-def train_one_epoch(model, optimizer, dataloader, batch_size, num_accumulation_steps):
+def train_one_epoch(model, optimizer, dataloader, class_weight_tensors, batch_size, num_accumulation_steps):
     epoch_loss = 0.
     epoch_label_losses = [0.] * len(ALL_FEATURES)
     n_batches = math.ceil(len(dataloader) * batch_size / 32) # virtual number of batches
@@ -65,7 +65,7 @@ def train_one_epoch(model, optimizer, dataloader, batch_size, num_accumulation_s
         outputs = model(inputs)
 
         # Compute the loss and its gradients
-        losses = losses_fn(MULTICLASS_FEATURES, MULTILABEL_FEATURES, outputs, targets)
+        losses = losses_fn(MULTICLASS_FEATURES, MULTILABEL_FEATURES, outputs, targets, class_weight_tensors)
         loss = join_losses(model, losses)
         loss = loss / num_accumulation_steps
         loss.backward()
@@ -180,7 +180,7 @@ def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, lear
 
         # Make sure gradient tracking is on, and do a pass over the data
         model.train(True)
-        train_loss, train_label_losses = train_one_epoch(model, optimizer, train_loader, batch_size, num_accumulation_steps)
+        train_loss, train_label_losses = train_one_epoch(model, optimizer, train_loader, class_weight_tensors, batch_size, num_accumulation_steps)
         torch.cuda.empty_cache()
 
         # Log train losses
@@ -194,7 +194,7 @@ def train(model_output_dir, feature, freeze_base_model, epochs, batch_size, lear
 
         # We don't need gradients on to do reporting
         model.train(False)
-        avg_vloss, running_label_vlosses, metrics = evaluate(model, validation_loader, MULTICLASS_FEATURES, MULTILABEL_FEATURES) 
+        avg_vloss, running_label_vlosses, metrics = evaluate(model, validation_loader, class_weight_tensors, MULTICLASS_FEATURES, MULTILABEL_FEATURES, batch_size, num_accumulation_steps) 
         logger.info('LOSS train {} valid {}'.format(train_loss, avg_vloss))
 
         # Log valid losses

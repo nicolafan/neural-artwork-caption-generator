@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import torch
 from sklearn.metrics import (accuracy_score, f1_score, hamming_loss,
@@ -89,7 +91,7 @@ def compute_metrics(outputs, targets, multiclass_features, multilabel_features):
 
 
 @torch.no_grad()
-def evaluate(model, dataloader, multiclass_features, multilabel_features):
+def evaluate(model, dataloader, class_weight_tensors, multiclass_features, multilabel_features, batch_size, num_accumulation_steps):
     all_features = multiclass_features + multilabel_features
 
     # Validate
@@ -97,6 +99,7 @@ def evaluate(model, dataloader, multiclass_features, multilabel_features):
     running_label_vlosses = [0.] * len(all_features)
     all_voutputs = []
     all_vtargets = []
+    n_batches = math.ceil(len(dataloader) * batch_size / 32) # virtual number of batches
     
     for vbatch in tqdm(dataloader):
         # Compute batch outputs
@@ -104,11 +107,11 @@ def evaluate(model, dataloader, multiclass_features, multilabel_features):
         voutputs = model(vinputs)
 
         # Compute batch losses
-        vlosses = losses_fn(multiclass_features, multilabel_features, voutputs, vtargets)
+        vlosses = losses_fn(multiclass_features, multilabel_features, voutputs, vtargets, class_weight_tensors)
         vloss = join_losses(model, vlosses)
         for i, _ in enumerate(all_features):
-            running_label_vlosses[i] += vlosses[i].item()
-        running_vloss += vloss.item()
+            running_label_vlosses[i] += vlosses[i].item() / num_accumulation_steps
+        running_vloss += vloss.item() / num_accumulation_steps
 
         # Save predictions and targets for later
         all_voutputs.append(
@@ -118,8 +121,8 @@ def evaluate(model, dataloader, multiclass_features, multilabel_features):
             {k: v.detach().cpu().numpy() for k, v in vtargets.items()}
         )
 
-    avg_vloss = running_vloss / len(dataloader)
-    running_label_vlosses = [loss / len(dataloader) for loss in running_label_vlosses]
+    avg_vloss = running_vloss / n_batches
+    running_label_vlosses = [loss / n_batches for loss in running_label_vlosses]
     all_voutputs = _concatenate_batch_arrays(all_voutputs)
     all_vtargets = _concatenate_batch_arrays(all_vtargets)
     metrics = compute_metrics(all_voutputs, all_vtargets, multiclass_features, multilabel_features)
