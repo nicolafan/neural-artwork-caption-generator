@@ -12,7 +12,7 @@ from PIL import Image
 from tqdm import tqdm
 
 from src.data.prepare_dataset import \
-    get_prepared_dataset_for_multiclassification
+    get_prepared_dataset_for_multiclassification, get_prepared_dataset_for_captioning
 from src.utils.dirutils import get_data_dir
 from src.utils.logutils import init_log
 
@@ -177,22 +177,35 @@ def main(min_label_count):
     make_imagefolder_dataset(df, input_dir, interim_dir, logger)
     logger.info("imagefolder interim dataset created")
 
-    # make hf multiclassification dataset
-    dataset, ordinal_encoders, multilabel_binarizers = get_prepared_dataset_for_multiclassification(interim_dir)
+    if not (output_dir / "multiclassification_dataset").exists():
+        # make hf multiclassification dataset
+        dataset, ordinal_encoders, multilabel_binarizers = get_prepared_dataset_for_multiclassification(interim_dir)
 
-    # save hf multiclassification dataset
-    dataset.save_to_disk(output_dir / "multiclassification_dataset")
-    logger.info("hf multiclassification dataset saved")
+        # save hf multiclassification dataset
+        dataset.save_to_disk(output_dir / "multiclassification_dataset")
+        logger.info("hf multiclassification dataset saved")
 
-    # save ordinal encoders and multilabel binarizers
-    os.makedirs(output_dir / "ordinal_encoders", exist_ok=True)
-    for feature, encoder in ordinal_encoders.items():
-        dump(encoder, output_dir / "ordinal_encoders" / f"{feature}.joblib")
-    logger.info("saved ordinal encoders")
-    os.makedirs(output_dir / "multilabel_binarizers", exist_ok=True)
-    for feature, binarizer in multilabel_binarizers.items():
-        dump(binarizer, output_dir / "multilabel_binarizers" / f"{feature}.joblib")
-    logger.info("saved multilabel binarizers")
+        # save ordinal encoders and multilabel binarizers
+        os.makedirs(output_dir / "ordinal_encoders", exist_ok=True)
+        for feature, encoder in ordinal_encoders.items():
+            dump(encoder, output_dir / "ordinal_encoders" / f"{feature}.joblib")
+        logger.info("saved ordinal encoders")
+        os.makedirs(output_dir / "multilabel_binarizers", exist_ok=True)
+        for feature, binarizer in multilabel_binarizers.items():
+            dump(binarizer, output_dir / "multilabel_binarizers" / f"{feature}.joblib")
+        logger.info("saved multilabel binarizers")
+
+    if not (output_dir / "captioning_dataset").exists():
+        # make hf captioning dataset
+        dataset, tokenizer = get_prepared_dataset_for_captioning(interim_dir)
+
+        # save hf captioning dataset
+        dataset.save_to_disk(output_dir / "captioning_dataset")
+        logger.info("hf captioning dataset saved")
+
+        # save tokenizer
+        tokenizer.to_json(output_dir / "tokenizer.json")
+        logger.info("saved tokenizer")
 
     # delete interim dataset
     for split in "train", "test", "val":

@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from datasets import load_dataset
 from sklearn.preprocessing import MultiLabelBinarizer, OrdinalEncoder
+from src.features.tokenize import SpacyTokenizer
 
 
 def _encode_multiclass_feature(examples, feature, encoder):
@@ -81,6 +82,46 @@ def _get_fitted_multilabel_binarizer(dataset, feature):
     return mlb.fit(training_values)
 
 
+def _sort_dataset(dataset, data_dir):
+    for split in dataset.keys():
+        # read data_dir/metadata.csv
+        metadata = pd.read_csv(Path(data_dir) / (split if split != "validation" else "val") / "metadata.csv")
+        # get list of locations of file_name in dataset in the metadata column
+        metadata_order = {}
+        for idx, row in metadata.iterrows():
+            metadata_order[row["file_name"]] = idx
+        try:
+            order = [metadata_order[os.path.basename(x["image"].filename)] for x in dataset[split]]
+        except KeyError:
+            print(len(metadata_order))
+            print(len(dataset[split]))
+            print(split)
+            for image in dataset[split]:
+                if not os.path.basename(image["image"].filename) in metadata_order:
+                    print(os.path.basename(image["image"].filename))
+
+        # sort dataset[split] by filename according to the file_name column in metadata
+        dataset[split] = dataset[split].add_column("order", order)
+        dataset[split] = dataset[split].sort("order")
+        dataset[split] = dataset[split].remove_columns(["order"])
+    return dataset
+
+
+def get_prepared_dataset_for_captioning(data_dir):
+    dataset = load_dataset("imagefolder", data_dir=data_dir)
+
+    tokenizer = SpacyTokenizer(max_length=40, min_occurrences=5)
+    tokenizer.fit(dataset["train"]["caption"])
+
+    for key in dataset.keys():
+        dataset[key]["caption"] = tokenizer.transform(dataset[key]["caption"])
+
+    dataset = dataset.remove_columns(["artist", "genre", "style", "tags", "media", "human"])
+    dataset = _sort_dataset(dataset, data_dir)
+
+    return dataset, tokenizer
+
+
 def get_prepared_dataset_for_multiclassification(data_dir):
     """Loads the dataset and prepares it for multiclassification.
 
@@ -119,26 +160,6 @@ def get_prepared_dataset_for_multiclassification(data_dir):
         )
 
     dataset = dataset.remove_columns(["caption", "human"])
-
-    for split in dataset.keys():
-        # read data_dir/metadata.csv
-        metadata = pd.read_csv(Path(data_dir) / (split if split != "validation" else "val") / "metadata.csv")
-        # get list of locations of file_name in dataset in the metadata column
-        metadata_order = {}
-        for idx, row in metadata.iterrows():
-            metadata_order[row["file_name"]] = idx
-        try:
-            order = [metadata_order[os.path.basename(x["image"].filename)] for x in dataset[split]]
-        except KeyError:
-            print(len(metadata_order))
-            print(len(dataset[split]))
-            print(split)
-            for image in dataset[split]:
-                if not os.path.basename(image["image"].filename) in metadata_order:
-                    print(os.path.basename(image["image"].filename))
-
-        # sort dataset[split] by filename according to the file_name column in metadata
-        dataset[split] = dataset[split].add_column("order", order)
-        dataset[split] = dataset[split].sort("order")
-        dataset[split] = dataset[split].remove_columns(["order"])
+    dataset = _sort_dataset(dataset, data_dir)
+    
     return dataset, ordinal_encoders, multilabel_binarizers
