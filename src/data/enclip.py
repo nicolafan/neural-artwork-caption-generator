@@ -17,7 +17,6 @@ def main(images_dir, output_dir):
 
     The order of the embeddings corresponds to the alphabetical order of the filenames
     returned by os.listdir(images_dir).
-    The first embedding must be discarded as it is a dummy embedding.
 
     Args:
         images_dir (Path): Path to directory containing images.
@@ -47,7 +46,8 @@ def main(images_dir, output_dir):
             (embeddings, images_features.detach().numpy()), axis=0
         )
 
-    clip_embeddings_path = output_dir / "clip_embeddings.npy"
+    embeddings = embeddings[1:]
+    clip_embeddings_path = output_dir / "clip" / "image_embeddings_alpha_order.npy"
     np.save(clip_embeddings_path, embeddings)
     logger.info(f"CLIP embeddings created at {clip_embeddings_path}")
 
