@@ -8,7 +8,8 @@ class ViTForMultiClassification(nn.Module):
     def __init__(
         self,
         multiclass_classifications: dict[str, int],
-        multilabel_classifications: dict[str, int]
+        multilabel_classifications: dict[str, int],
+        dropout_rate: float = 0.0,
     ):
         """Initialize a ViTForMultiClassification model for multi-classification and multi-label classification.
 
@@ -26,6 +27,9 @@ class ViTForMultiClassification(nn.Module):
 
         # initialize ViT model
         self.vit = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k", add_pooling_layer=False)
+
+        # add final dropout
+        self.dropout = nn.Dropout(dropout_rate)
 
         # initialize classification heads
         if self.multiclass_classifications:
@@ -82,6 +86,7 @@ class ViTForMultiClassification(nn.Module):
             pixel_values (torch.Tensor): pixel values of the images
         """
         x = self.vit(pixel_values=pixel_values).last_hidden_state[:, 0]
+        x = self.dropout(x)
         logits = None
 
         if self.multiclass_classifications:
