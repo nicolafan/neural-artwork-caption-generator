@@ -10,6 +10,7 @@ import random
 import click
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from datasets import Dataset, load_from_disk
 from dotenv import find_dotenv, load_dotenv
@@ -51,7 +52,7 @@ def find_last_checkpoint(dir):
     return sorted(dir.glob("*.pt"), key=lambda x: int(x.stem.split("-")[-1].replace(".pt", "")))[-1]
 
 
-def train_one_epoch(model, optimizer, dataloader, class_weight_tensors, batch_size, num_accumulation_steps):
+def train_one_epoch(model, optimizer, dataloader, class_weight_tensors, batch_size, num_accumulation_steps, max_grad_norm):
     epoch_loss = 0.
     epoch_label_losses = [0.] * len(ALL_FEATURES)
     n_batches = math.ceil(len(dataloader) * batch_size / 32) # virtual number of batches
@@ -77,6 +78,8 @@ def train_one_epoch(model, optimizer, dataloader, class_weight_tensors, batch_si
 
         if (i+1) % num_accumulation_steps == 0 or (i+1) == len(dataloader):
             # Update weights
+            if max_grad_norm is not None:   
+                nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_grad_norm)
             optimizer.step()
             optimizer.zero_grad()
 
@@ -134,7 +137,19 @@ def train_one_epoch(model, optimizer, dataloader, class_weight_tensors, batch_si
     default=True,
     help="Whether to reload the optimizer.",
 )
-def train(model_output_dir, feature, freeze_base_model, freeze_log_vars, epochs, batch_size, learning_rate, resume_from_checkpoint, reload_optimizer):
+@click.option(
+    "--clip-grad-norm",
+    type=float,
+    default=None,
+    help="Clip the gradient norm to this value.",
+)
+@click.option(
+    "--dropout-rate",
+    type=float,
+    default=0.0,
+    help="Dropout rate to use for training.",
+)
+def train(model_output_dir, feature, freeze_base_model, freeze_log_vars, epochs, batch_size, learning_rate, resume_from_checkpoint, reload_optimizer, clip_grad_norm, dropout_rate):
     # TODO: optimizer can also not be reloaded
     logger = logging.getLogger(__name__)
     random.seed(42)
@@ -155,7 +170,7 @@ def train(model_output_dir, feature, freeze_base_model, freeze_log_vars, epochs,
         remove_useless_features(feature)
 
     # load model
-    model = ViTForMultiClassification(MULTICLASS_CLASSIFICATIONS, MULTILABEL_CLASSIFICATIONS)
+    model = ViTForMultiClassification(MULTICLASS_CLASSIFICATIONS, MULTILABEL_CLASSIFICATIONS, dropout_rate)
     model = model.to(DEVICE)
     model.freeze_base_model(freeze_base_model)
     model.freeze_log_vars(freeze_log_vars)
@@ -169,7 +184,7 @@ def train(model_output_dir, feature, freeze_base_model, freeze_log_vars, epochs,
 
         logger.info(f"loading checkpoint from {last_checkpoint}")
         checkpoint = torch.load(last_checkpoint)
-        model.load_state_dict(checkpoint["model_state_dict"])
+        model.load_state_dict(checkpoint["model_state_dict"], strict=False)
         if reload_optimizer:
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         epoch = checkpoint["epoch"]
@@ -184,7 +199,7 @@ def train(model_output_dir, feature, freeze_base_model, freeze_log_vars, epochs,
 
         # Make sure gradient tracking is on, and do a pass over the data
         model.train(True)
-        train_loss, train_label_losses = train_one_epoch(model, optimizer, train_loader, class_weight_tensors, batch_size, num_accumulation_steps)
+        train_loss, train_label_losses = train_one_epoch(model, optimizer, train_loader, class_weight_tensors, batch_size, num_accumulation_steps, clip_grad_norm)
         torch.cuda.empty_cache()
 
         # Log train losses
