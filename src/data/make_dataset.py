@@ -107,13 +107,14 @@ def make_imagefolder_dataset(df, input_dir, output_dir, logger):
             logger.error(
                 f"can't create the {split} split directory, delete it if it already exists"
             )
+            continue
 
         def adjust_filename(s):
-            return (s.replace("train", "t-rain")
-                     .replace("test", "t-est")
-                     .replace("validation", "v-alidation")
-                     .replace("val", "v-al")
-                     .replace("valid", "v-alid"))
+            return (s.replace("train", "t@@rain")
+                     .replace("test", "t@@est")
+                     .replace("validation", "v@@alidation")
+                     .replace("val", "v@@al")
+                     .replace("valid", "v@@alid"))
 
         # copy images
         logger.info(f"copying images for {split} split")
@@ -197,15 +198,11 @@ def main(min_label_count):
 
     if not (output_dir / "captioning_dataset").exists():
         # make hf captioning dataset
-        dataset, tokenizer = get_prepared_dataset_for_captioning(interim_dir)
+        dataset = get_prepared_dataset_for_captioning(interim_dir)
 
         # save hf captioning dataset
         dataset.save_to_disk(output_dir / "captioning_dataset")
         logger.info("hf captioning dataset saved")
-
-        # save tokenizer
-        tokenizer.to_json(output_dir / "tokenizer.json")
-        logger.info("saved tokenizer")
 
     # delete interim dataset
     for split in "train", "test", "val":

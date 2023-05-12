@@ -131,10 +131,10 @@ if __name__ == "__main__":
     # not used in this stub but often useful for finding various files
     data_dir = get_data_dir()
     raw_data_dir = data_dir / "raw"
-    processed_data_dir = data_dir / "processed"
+    interim_data_dir = data_dir / "interim"
 
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
 
-    main(raw_data_dir, processed_data_dir)
+    main(raw_data_dir, interim_data_dir)

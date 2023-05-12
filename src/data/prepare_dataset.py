@@ -1,3 +1,4 @@
+import joblib
 import os
 from functools import partial
 from pathlib import Path
@@ -5,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from datasets import load_dataset
+from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer, OrdinalEncoder
 from src.features.tokenize import SpacyTokenizer
 
@@ -90,15 +92,7 @@ def _sort_dataset(dataset, data_dir):
         metadata_order = {}
         for idx, row in metadata.iterrows():
             metadata_order[row["file_name"]] = idx
-        try:
-            order = [metadata_order[os.path.basename(x["image"].filename)] for x in dataset[split]]
-        except KeyError:
-            print(len(metadata_order))
-            print(len(dataset[split]))
-            print(split)
-            for image in dataset[split]:
-                if not os.path.basename(image["image"].filename) in metadata_order:
-                    print(os.path.basename(image["image"].filename))
+        order = [metadata_order[os.path.basename(x["image"].filename)] for x in dataset[split]]
 
         # sort dataset[split] by filename according to the file_name column in metadata
         dataset[split] = dataset[split].add_column("order", order)
@@ -110,16 +104,25 @@ def _sort_dataset(dataset, data_dir):
 def get_prepared_dataset_for_captioning(data_dir):
     dataset = load_dataset("imagefolder", data_dir=data_dir)
 
-    tokenizer = SpacyTokenizer(max_length=40, min_occurrences=5)
-    tokenizer.fit(dataset["train"]["caption"])
+    if (data_dir / "clip").is_dir():
+        clip_embeddings_dict = joblib.load(data_dir / "clip" / "dataset_embeddings.joblib")
 
-    for key in dataset.keys():
-        dataset[key]["caption"] = tokenizer.transform(dataset[key]["caption"])
+        def _add_clip_scores(example):
+            embeddings = clip_embeddings_dict[os.path.basename(example["image"].filename.replace("@@", ""))]
+            score = cosine_similarity(
+                [embeddings["img_embedding"]], [embeddings["caption_embedding"]]
+            )[0][0]
+            if score < 0:
+                score = 0
+            example["clip_score"] = score
+            return example
+        
+        dataset = dataset.map(_add_clip_scores)
 
     dataset = dataset.remove_columns(["artist", "genre", "style", "tags", "media", "human"])
     dataset = _sort_dataset(dataset, data_dir)
 
-    return dataset, tokenizer
+    return dataset
 
 
 def get_prepared_dataset_for_multiclassification(data_dir):
