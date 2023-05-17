@@ -64,20 +64,6 @@ def enclip_images(processor, model, df_captions, images_dir):
     return embeddings_dict
 
 
-def fenclip_images(df_captions, images_dir):
-    embeddings = np.load(
-        get_data_dir() / "processed" / "clip" / "image_embeddings_alpha_order.npy"
-    )
-    filenames = sorted(os.listdir(images_dir))
-    embeddings = embeddings[1:]
-    embeddings_dict = {}
-
-    for i, filename in enumerate(filenames):
-        embeddings_dict[filename] = embeddings[i]
-
-    return embeddings_dict
-
-
 def main(input_dir, output_dir):
     """Creates CLIP embeddings for images in images_dir and saves them to
     output_dir.
