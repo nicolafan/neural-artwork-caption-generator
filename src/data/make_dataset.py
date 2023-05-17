@@ -123,8 +123,8 @@ def make_imagefolder_dataset(df, input_dir, output_dir, logger):
             # convert to RGB if needed
             if image.mode == "RGBA" or image.mode == "P":
                 image = image.convert("RGB")
-            filename = adjust_filename(filename)
-            image.save(split_dir / filename)
+            new_filename = adjust_filename(filename)
+            image.save(split_dir / new_filename)
         logger.info("images copied")
 
         # create metadata
