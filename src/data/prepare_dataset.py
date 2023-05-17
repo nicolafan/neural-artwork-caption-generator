@@ -119,6 +119,10 @@ def get_prepared_dataset_for_captioning(data_dir):
         
         dataset = dataset.map(_add_clip_scores)
 
+    def _add_filename(example):
+        example["file_name"] = os.path.basename(example["image"].filename.replace("@@", ""))
+        return example
+    dataset = dataset.map(_add_filename)
     dataset = dataset.remove_columns(["artist", "genre", "style", "tags", "media", "human"])
     dataset = _sort_dataset(dataset, data_dir)
 
@@ -162,6 +166,10 @@ def get_prepared_dataset_for_multiclassification(data_dir):
             batched=True,
         )
 
+    def _add_filename(example):
+        example["file_name"] = os.path.basename(example["image"].filename)
+        return example
+    dataset = dataset.map(_add_filename)
     dataset = dataset.remove_columns(["caption", "human"])
     dataset = _sort_dataset(dataset, data_dir)
     
