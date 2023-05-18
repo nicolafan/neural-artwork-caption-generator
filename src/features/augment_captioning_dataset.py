@@ -17,9 +17,9 @@ def main():
         batch_size=16,
     )
 
-    back_translation_aug_jap = naw.BackTranslationAug(
-        from_model_name="Helsinki-NLP/opus-mt-en-jap",
-        to_model_name="Helsinki-NLP/opus-mt-jap-en",
+    back_translation_aug_de = naw.BackTranslationAug(
+        from_model_name="Helsinki-NLP/opus-mt-en-de",
+        to_model_name="Helsinki-NLP/opus-mt-de-en",
         device="cuda",
         batch_size=16,
     )
@@ -42,8 +42,8 @@ def main():
             captions.append("The artwork depicts " + aug_captions[i])
         return examples
     dataset = dataset.map(partial(_augment_captions, augmenter=back_translation_aug_fr), batched=True)
-    dataset = dataset.map(partial(_augment_captions, augmenter=back_translation_aug_jap), batched=True)
-    dataset.save_to_disk(data_dir / "processed" / "augmented_captioning_dataset")
+    dataset = dataset.map(partial(_augment_captions, augmenter=back_translation_aug_de), batched=True)
+    dataset.save_to_disk(data_dir / "processed" / "captioning_dataset_augmented")
     
 
 if __name__ == "__main__":
