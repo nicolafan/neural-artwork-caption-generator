@@ -8,7 +8,6 @@ import pandas as pd
 from datasets import load_dataset
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer, OrdinalEncoder
-from src.features.tokenize import SpacyTokenizer
 
 
 def _encode_multiclass_feature(examples, feature, encoder):
