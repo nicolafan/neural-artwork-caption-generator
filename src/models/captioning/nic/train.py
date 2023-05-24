@@ -22,6 +22,7 @@ from src.models.captioning.utils import (
     _transform_test,
     _transform_train,
     compute_metrics,
+    get_multicassification_vit_tools,
 )
 from src.utils.dirutils import get_data_dir, get_models_dir
 
@@ -50,25 +51,7 @@ def main():
     )
     tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
 
-    image_processor = ViTImageProcessor.from_pretrained(
-        "google/vit-base-patch16-224-in21k"
-    )
-    image_encoder = ViTModel(
-        ViTConfig.from_pretrained("google/vit-base-patch16-224-in21k"),
-        add_pooling_layer=False,
-    )
-    multiclassification_checkpoint = torch.load(
-        get_models_dir()
-        / "multiclassification"
-        / "full"
-        / "model-20230513_121917-35.pt"
-    )
-    image_encoder_state_dict = dict(
-        (k[4:], v)
-        for k, v in multiclassification_checkpoint["model_state_dict"].items()
-        if k.startswith("vit")
-    )
-    image_encoder.load_state_dict(image_encoder_state_dict)
+    image_processor, image_encoder = get_multicassification_vit_tools()
 
     dataset["train"].set_transform(
         partial(
@@ -102,8 +85,6 @@ def main():
     model = NeuralImageCaptioner(image_encoder, len(tokenizer))
     model.to(DEVICE)
 
-    output = model.generate(next(iter(train_dataloader))["pixel_values"].to(DEVICE), max_length=MAX_LENGTH)
-
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
     scheduler = get_cosine_schedule_with_warmup(
         optimizer,
@@ -113,7 +94,15 @@ def main():
     running_loss = 0.0
     epoch = 0
 
+    checkpoint = torch.load(get_models_dir() / "captioning" / "nic" / "0.pt", map_location=torch.device("cpu"))
+    model.load_state_dict(checkpoint["model_state_dict"])
+    model.to(DEVICE)
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+    epoch = checkpoint["epoch"] + 1
+
     while epoch < EPOCHS:
+        model.train(True)
         for step, batch in enumerate(tqdm(train_dataloader), start=1):
             text_inputs = {
                 "input_ids": batch.pop("input_ids").to(DEVICE),
@@ -160,7 +149,8 @@ def main():
             },
             OUTPUT_DIR / f"{epoch}.pt",
         )
-        metrics = compute_metrics(model, validation_dataloader, tokenizer, DEVICE)
+        metrics = compute_metrics(model, tokenizer, validation_dataloader, MAX_LENGTH)
+        metrics["loss"] = avg_loss
         with open(os.path.join(OUTPUT_DIR, f"{epoch}_metrics.json"), "w") as f:
             json.dump(metrics, f, indent=2)
         epoch += 1
@@ -168,3 +158,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
