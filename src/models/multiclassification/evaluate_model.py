@@ -50,6 +50,7 @@ def compute_metrics(outputs, targets, multiclass_features, multilabel_features):
 
     # Computing accuracy, precision, recall, and F1 for multiclass classifications
     for feature in multiclass_features:
+        # if feature == "artist" mask also 174
         mask = targets[feature] != -1 # remove invalid predictions (if present)
         targets[feature] = np.squeeze(targets[feature][mask])
         outputs[feature] = outputs[feature][:, np.newaxis]

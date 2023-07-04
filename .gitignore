@@ -78,6 +78,7 @@ target/
 
 # exclude data from source control by default
 /data/
+/notebooks/images_human
 
 # exclude models by default
 /models/multiclassification/
