@@ -51,6 +51,10 @@ Project Organization
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
+Authors and Acknowlodgements
+----------------------------
+
+This repo is part of Nicola Fanelli's MSc thesis, realized with the supervision of Dr. Gennaro Vessio, Prof. Giovanna Castellano and Raffaele Scaringi.
 
 --------
 
