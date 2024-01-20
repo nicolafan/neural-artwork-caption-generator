@@ -1,4 +1,4 @@
-Neural Artwork Caption Generator
+Exploring the Synergy Between Vision-Language Pretraining and ChatGPT for Artwork Captioning: A Preliminary Study
 ==============================
 
 A Neural Artwork Caption Generator with Deep Learning.
