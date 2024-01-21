@@ -1,4 +1,4 @@
-Exploring the Synergy Between Vision-Language Pretraining and ChatGPT for Artwork Captioning: A Preliminary Study
+Neural Artwork Caption Generator
 ==============================
 
 This repository contains the code used in the paper ["Exploring the Synergy Between Vision-Language Pretraining and ChatGPT for Artwork Captioning: A Preliminary Study"](https://www.researchgate.net/publication/377558832_Exploring_the_Synergy_Between_Vision-Language_Pretraining_and_ChatGPT_for_Artwork_Captioning_A_Preliminary_Study).
